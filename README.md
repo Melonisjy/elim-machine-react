@@ -15,7 +15,7 @@
 - zustand
 등을 사용했습니다.
 
-# 📄 demo
+<!-- # 📄 demo
 ## 기계설비현장
 ### 보고서 관련 모달
 <table>
@@ -103,4 +103,23 @@
       <img width="1824" height="1107" alt="image" src="https://github.com/user-attachments/assets/c881a2cc-76d2-4326-b703-4d42b795af60" />
     </td>
   </tr>
-</table>
+</table> -->
+
+
+---
+
+## ⚙️ Development Environment
+
+본 프로젝트는 인하우스에서 유지보수 및 기능 확장을 진행하고 있습니다.  
+아래 환경을 기준으로 개발 및 실행을 권장합니다.
+
+- **Node.js**: v24.12.0
+- **Package Manager**: npm  
+  (package-lock.json 기준)
+
+### ▶️ Getting Started
+
+```bash
+npm install
+npm run dev
+```
