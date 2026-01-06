@@ -60,7 +60,8 @@ auth.interceptors.request.use(config => {
   const accessToken = useAccessTokenStore.getState().accessToken
 
   if (accessToken) {
-    config.headers!.Authorization = `Bearer ${accessToken}`
+    config.headers = config.headers ?? {}
+    config.headers.Authorization = `Bearer ${accessToken}`
   } else {
     console.log('no access token')
   }
@@ -89,7 +90,9 @@ auth.interceptors.response.use(
         useAccessTokenStore.getState().setAccessToken(newAccessToken)
 
         // 실패했던 요청 다시 실행
-        error.config.headers.Authorization = `Bearer ${newAccessToken}`
+        const originalRequest = error.config
+        originalRequest.headers = originalRequest.headers ?? {}
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
 
         return auth(originalRequest)
       } catch (err) {
