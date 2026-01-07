@@ -20,19 +20,13 @@ export async function login(email: string, password: string) {
       { withCredentials: true }
     )
 
-    if (res.data.code === 200) {
-      const accessToken = res.data.data.tokenResponseDto.accessToken // JSON body에서 가져옴
+    const accessToken = res.data.data.tokenResponseDto.accessToken // JSON body에서 가져옴
+    useAccessTokenStore.getState().setAccessToken(accessToken)
 
-      useAccessTokenStore.getState().setAccessToken(accessToken)
+    const UserInfo = res.data.data.loginMemberResponseDto
+    useCurrentUserStore.getState().setCurrentUser(UserInfo)
 
-      const UserInfo = res.data.data.loginMemberResponseDto
-
-      useCurrentUserStore.getState().setCurrentUser(UserInfo)
-
-      return res.data.code
-    } else {
-      throw new Error()
-    }
+    return res.data.code
   } catch (error) {
     return error
   }
