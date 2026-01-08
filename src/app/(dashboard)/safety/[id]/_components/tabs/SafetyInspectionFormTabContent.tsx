@@ -432,12 +432,12 @@ const SafetyInspectionFormTabContent = () => {
               <tr></tr>
               {/* 건축물 점검결과 점검자 의견 */}
               <tr>
-                <Th colSpan={1} style={{ border: '2px solid #000', whiteSpace: 'nowrap' }}>
+                <Th colSpan={1} style={{ borderTop: '2px solid #000', borderBottom: '2px solid #000', whiteSpace: 'nowrap' }}>
                   건축물 점검결과
                   <br />
                   점검자 의견
                 </Th>
-                <Td colSpan={7} style={{ border: '2px solid #000', borderLeft: 'none' }}>
+                <Td colSpan={7} style={{ borderTop: '2px solid #000', borderBottom: '2px solid #000' }}>
                   <FormTextField multiline rows={7} />
                 </Td>
               </tr>
