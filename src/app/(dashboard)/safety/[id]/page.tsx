@@ -37,6 +37,7 @@ import useSafetyProjectTabValueStore from '@/@core/hooks/zustand/useSafetyProjec
 import SafetyProjectTabContent from './_components/tabs/SafetyProjectTabContent'
 import NoteTabContent from './_components/tabs/NoteTabContent'
 import ScheduleAndEngineerTabContent from './_components/tabs/ScheduleAndEngineerTabContent'
+import SafetyInspectionFormTabContent from './_components/tabs/SafetyInspectionFormTabContent'
 
 const Tabs: { value: SafetyProjectTabValueType; label: SafetyProjectTabValueType }[] = [
   { value: '현장정보', label: '현장정보' },
@@ -154,6 +155,9 @@ const SafetyProjectPage = () => {
                 ) : (
                   <Typography>점검일정 및 참여기술진 정보를 불러오는 중입니다.</Typography>
                 )}
+              </TabPanel>
+              <TabPanel value='현장점검표' className='h-full'>
+                <SafetyInspectionFormTabContent />
               </TabPanel>
               {/*
               <TabPanel value='설비목록' className='h-full'>
