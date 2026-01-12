@@ -32,19 +32,19 @@ export const getErrorMessage = (error: any, defaultMessage: string = '처리 중
 
 /**
  * API 에러를 처리하고 alert로 메시지를 표시합니다.
- * @param error - axios 에러 객체
+ * @param error - axios 에러 객체 또는 에러 메시지 문자열
  * @param defaultMessage - 기본 에러 메시지 (선택사항)
  * @param showAlert - alert 표시 여부 (기본값: true)
  * @returns 에러 메시지 문자열
  */
 export const handleApiError = (
-  error: any,
+  error: any | string,
   defaultMessage: string = '처리 중 오류가 발생했습니다.',
   showAlert: boolean = true
 ): string => {
   console.error('API Error:', error)
 
-  const errorMessage = getErrorMessage(error, defaultMessage)
+  const errorMessage = typeof error === 'string' ? error : getErrorMessage(error, defaultMessage)
 
   if (showAlert) {
     toast.error(errorMessage)
