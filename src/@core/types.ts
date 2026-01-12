@@ -1485,7 +1485,7 @@ export interface EngineerBasicResponseDtoType {
 // ----------- 로그인 -----------
 // POST /api/authentication/web/login
 export interface LoginResponseDtoType {
-  tokenResponseDto: TokenResponseDto
+  jwtTokenRes: TokenResponseDto
   userSeq: number
   name: string
   email: string
