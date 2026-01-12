@@ -139,39 +139,39 @@ auth.interceptors.request.use(config => {
   return config
 })
 
-// 기계설비용 Java 백엔드 인터셉터
-auth.interceptors.response.use(
-  response => response,
-  async error => {
-    const originalRequest = error.config
+// 기계설비용 Java 백엔드 인터셉터 (java 백엔드 사용안할 시 주석)
+// auth.interceptors.response.use(
+//   response => response,
+//   async error => {
+//     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+//     if (error.response?.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true
 
-      try {
-        const res = await axios.post<{ data: TokenResponseDto }>(
-          `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/authentication/web/refresh`,
-          null,
-          { withCredentials: true }
-        )
+//       try {
+//         const res = await axios.post<{ data: TokenResponseDto }>(
+//           `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/api/authentication/web/refresh`,
+//           null,
+//           { withCredentials: true }
+//         )
 
-        const newAccessToken = res.data.data.accessToken
-        useAccessTokenStore.getState().setAccessToken(newAccessToken)
+//         const newAccessToken = res.data.data.accessToken
+//         useAccessTokenStore.getState().setAccessToken(newAccessToken)
 
-        originalRequest.headers = originalRequest.headers ?? {}
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+//         originalRequest.headers = originalRequest.headers ?? {}
+//         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
 
-        return auth(originalRequest)
-      } catch (err) {
-        useAccessTokenStore.getState().setAccessToken(null)
-        console.log('refresh failed!')
-        window.location.href = '/login'
-      }
-    }
+//         return auth(originalRequest)
+//       } catch (err) {
+//         useAccessTokenStore.getState().setAccessToken(null)
+//         console.log('refresh failed!')
+//         window.location.href = '/login'
+//       }
+//     }
 
-    return Promise.reject(error)
-  }
-)
+//     return Promise.reject(error)
+//   }
+// )
 
 // PHP API용 인터셉터
 phpAuth.interceptors.request.use(config => {
