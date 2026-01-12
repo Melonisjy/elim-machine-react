@@ -1483,22 +1483,23 @@ export interface EngineerBasicResponseDtoType {
 }
 
 // ----------- 로그인 -----------
-// POST /api/auth/web/login
+// POST /api/authentication/web/login
 export interface LoginResponseDtoType {
-  tokenResponseDto: TokenResponseDto
-  loginMemberResponseDto: {
-    memberId: number
-    name: string
-  }
+  jwtTokenRes: TokenResponseDto
+  userSeq: number
+  name: string
+  email: string
+  status: string
+  roles: string[]
+  pwResetRequired?: boolean
 }
+
 
 // JWT 토큰 발급 DTO
 export interface TokenResponseDto {
   tokenType: string
   accessToken: string
-  refreshToken: string
-  accessTokenExpiresIn: number
-  refreshTokenExpiresIn: number
+  accessExp: number
 }
 
 // ----------- 공통 -----------

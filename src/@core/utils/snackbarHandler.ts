@@ -14,6 +14,11 @@ export function printInfoSnackbar(message: string, autoHideDuration = 1000) {
   enqueueSnackbar(message, { variant: 'info', autoHideDuration: autoHideDuration })
 }
 
-export function printErrorSnackbar(error: any, message = '처리 중 오류가 발생했습니다', autoHideDuration = 1000) {
-  enqueueSnackbar(getErrorMessage(error, message), { variant: 'error', autoHideDuration: autoHideDuration })
+export function printErrorSnackbar(
+  error: any | string,
+  message = '처리 중 오류가 발생했습니다',
+  autoHideDuration = 1000
+) {
+  const errorMessage = typeof error === 'string' ? error : getErrorMessage(error, message)
+  enqueueSnackbar(errorMessage, { variant: 'error', autoHideDuration: autoHideDuration })
 }
