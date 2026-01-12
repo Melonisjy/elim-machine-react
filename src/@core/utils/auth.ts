@@ -5,6 +5,7 @@ import axios from 'axios'
 import type { LoginResponseDtoType, TokenResponseDto } from '@core/types'
 import useAccessTokenStore from '@/@core/hooks/zustand/useAuthStore'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
+import { API_ERROR_CODES } from '@/@core/constants/apiErrorCodes'
 
 // PHP API 공통 응답 형식 (ApiResult)
 export interface PhpApiResult<T = unknown> {
@@ -37,12 +38,6 @@ const AUTH_ENDPOINTS = [
   '/api/authentication/web/refresh'
 ] as const
 
-const ERROR_CODES = {
-  NETWORK_ERROR: -1,
-  INVALID_RESPONSE: -2,
-  MISSING_TOKEN: -3
-} as const
-
 /**
  * 로그인 함수 (PHP API 사용)
  * @param email 이메일
@@ -69,7 +64,7 @@ export async function login(email: string, password: string): Promise<number> {
 
       if (!accessToken) {
         console.error('로그인 응답에 accessToken이 없습니다:', responseData)
-        return ERROR_CODES.MISSING_TOKEN
+        return API_ERROR_CODES.MISSING_TOKEN
       }
 
       useAccessTokenStore.getState().setAccessToken(accessToken)
@@ -85,20 +80,21 @@ export async function login(email: string, password: string): Promise<number> {
       return res.status
     } else {
       console.error('로그인 실패:', res.data.message, 'code:', res.data.code)
-      // 실패 시에도 HTTP 상태 코드 반환 (일관성 유지)
-      return res.status || res.data.code || -1
+      // 백엔드 에러 코드 우선 반환
+      return res.data.code || res.status || API_ERROR_CODES.INTERNAL_ERROR
     }
   } catch (error: any) {
     // 네트워크 오류 또는 기타 예외
     if (error.response) {
-      // HTTP 응답이 있는 경우 상태 코드 반환
+      // HTTP 응답이 있는 경우
       const apiError = error.response.data as PhpApiResult
-      console.error('PHP 로그인 실패:', apiError?.message || error.message, 'code:', error.response.status)
-      return error.response.status || apiError?.code || -1
+      console.error('PHP 로그인 실패:', apiError?.message || error.message, 'code:', apiError?.code)
+      // 백엔드 에러 코드 우선, 없으면 HTTP 상태 코드
+      return apiError?.code || error.response.status || API_ERROR_CODES.NETWORK_ERROR
     }
     console.error('PHP 로그인 네트워크 오류:', error)
     // 네트워크 오류 등 응답이 없는 경우
-    return ERROR_CODES.NETWORK_ERROR
+    return API_ERROR_CODES.NETWORK_ERROR
   }
 }
 
