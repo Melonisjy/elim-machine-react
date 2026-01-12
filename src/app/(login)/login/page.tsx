@@ -28,6 +28,7 @@ import 'react-toastify/ReactToastify.css'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { printErrorSnackbar, printSuccessSnackbar } from '@core/utils/snackbarHandler'
+import { getErrorMessageByCode, getDefaultMessageByStatus } from '@/@core/constants/apiErrorCodes'
 
 type LoginFormInputs = {
   email: string
@@ -69,10 +70,16 @@ export default function LoginPage() {
         handleSuccess(`환영합니다${userName ? `,\n${userName}님` : ''}`)
       }
     } else {
+      // 에러 코드에 맞는 메시지 가져오기
+      const errorMessage = getErrorMessageByCode(
+        response,
+        getDefaultMessageByStatus(response)
+      )
+
       if (isTablet) {
-        printErrorSnackbar(response, '로그인 오류 발생')
+        printErrorSnackbar(errorMessage, '로그인 오류 발생')
       } else {
-        handleApiError(response, '로그인 오류 발생')
+        handleApiError(errorMessage, '로그인 오류 발생')
       }
     }
   }
