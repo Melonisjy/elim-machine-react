@@ -30,13 +30,26 @@ export const phpAuth = axios.create({
   }
 })
 
+// Constants 
+const AUTH_ENDPOINTS = [
+  '/api/authentication/web/login',
+  '/api/authentication/web/logout',
+  '/api/authentication/web/refresh'
+] as const
+
+const ERROR_CODES = {
+  NETWORK_ERROR: -1,
+  INVALID_RESPONSE: -2,
+  MISSING_TOKEN: -3
+} as const
+
 /**
  * 로그인 함수 (PHP API 사용)
  * @param email 이메일
  * @param password 비밀번호
- * @returns 응답 코드 (0: 성공, 그 외: 에러 코드)
+ * @returns HTTP 상태 코드 (200-299: 성공, 그 외: 에러)
  */
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string): Promise<number> {
   try {
     // PHP 로그인 요청
     const res = await phpAuth.post<PhpApiResult<LoginResponseDtoType>>('/api/authentication/web/login', {
@@ -49,14 +62,14 @@ export async function login(email: string, password: string) {
 
     if (res.data.success && res.data.data) {
       // PHP API 응답 구조 확인
-      const responseData = res.data.data
+      const responseData: LoginResponseDtoType = res.data.data
 
       // PHP API 응답 구조: jwtTokenRes.accessToken
       const accessToken = responseData.jwtTokenRes?.accessToken
 
       if (!accessToken) {
         console.error('로그인 응답에 accessToken이 없습니다:', responseData)
-        return -1
+        return ERROR_CODES.MISSING_TOKEN
       }
 
       useAccessTokenStore.getState().setAccessToken(accessToken)
@@ -85,7 +98,7 @@ export async function login(email: string, password: string) {
     }
     console.error('PHP 로그인 네트워크 오류:', error)
     // 네트워크 오류 등 응답이 없는 경우
-    return -1
+    return ERROR_CODES.NETWORK_ERROR
   }
 }
 
@@ -182,13 +195,7 @@ phpAuth.interceptors.response.use(
   async error => {
     const originalRequest = error.config
 
-    // 인증 관련 엔드포인트는 인터셉터에서 제외 (무한 루프 방지)
-    const authEndpoints = [
-      '/api/authentication/web/login',
-      '/api/authentication/web/logout',
-      '/api/authentication/web/refresh'
-    ]
-    const isAuthEndpoint = authEndpoints.some(endpoint => originalRequest.url?.includes(endpoint))
+    const isAuthEndpoint = AUTH_ENDPOINTS.some(endpoint => originalRequest.url?.includes(endpoint))
 
     if (isAuthEndpoint) {
       // 로그인/로그아웃/refresh 엔드포인트는 그대로 에러 반환
