@@ -55,7 +55,8 @@ export default function LoginPage() {
 
     const response = await login(email, password)
 
-    if (response === 200) {
+    // 200번대 상태 코드는 모두 성공으로 처리
+    if (response >= 200 && response < 300) {
       const userInfo = useCurrentUserStore.getState().currentUser
       const userName = userInfo?.name
 
