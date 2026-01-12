@@ -8,6 +8,8 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 
 import styles from '@core/styles/customTable.module.css'
 
+import SafetyInspectionPhotoArea from './SafetyInspectionPhotoArea'
+
 // 외벽 마감재 옵션
 const exteriorWallFinishOptions = [
   { value: 'DECORATIVE_BRICK', label: '치장벽돌' },
@@ -28,7 +30,7 @@ const groundSubsidenceOptions = [
 // 테이블 셀의 기본 스타일을 한 곳에서 관리합니다.
 // 이렇게 하면 나중에 스타일을 변경할 때 한 곳만 수정하면 됩니다.
 const baseCellStyle: React.CSSProperties = {
-  padding: '10px 12px',
+  padding: '4px 6px',
   border: '1px solid #d1d5db'
 }
 
@@ -78,6 +80,14 @@ const FormTextField: React.FC<TextFieldProps> = ({ placeholder, multiline, rows,
     multiline={multiline}
     rows={rows}
     type={type}
+    slotProps={{
+      input: {
+        sx: {
+          padding: '6px 12px',
+          fontSize: 14
+        }
+      }
+    }}
   />
 )
 
@@ -104,6 +114,13 @@ const SafetyInspectionFormTabContent = () => {
   const [ventilationType, setVentilationType] = useState('')
   const [groundSubsidence, setGroundSubsidence] = useState('GROUND_SUBSIDENCE_ROAD')
   
+  // 테스트용 fake 이미지 (전경사진) - 레거시 방식 URL 형식
+  // 실제로는 전체사진 탭에서 추가된 사진이 여기로 매핑되어 들어옴
+  const [frontViewPhotos] = useState<string[]>([
+    'https://work.eleng.co.kr/data/safety/2025/1263/pictures/4c28a76eb497bed315506b18df43451c.jpg',
+    'https://work.eleng.co.kr/data/safety/2025/1263/pictures/4c28a76eb497bed315506b18df43451c.jpg',
+    'https://work.eleng.co.kr/data/safety/2025/1263/pictures/4c28a76eb497bed315506b18df43451c.jpg'
+  ])
 
   return (
     <div className='h-full flex flex-col max-w-[890px]'>
@@ -152,8 +169,8 @@ const SafetyInspectionFormTabContent = () => {
               </tr>
               <tr>
                 <Th style={{ whiteSpace: 'nowrap' }}>전경사진</Th>
-                <Td colSpan={7} style={{ minHeight: '150px' }}>
-                  {/* 사진 영역 */}
+                <Td colSpan={7} style={{ minHeight: '80px' }}>
+                  <SafetyInspectionPhotoArea label='전경사진' photos={frontViewPhotos} />
                 </Td>
               </tr>
 
@@ -197,19 +214,19 @@ const SafetyInspectionFormTabContent = () => {
               </tr>
               {/* 두 번째 데이터 행 */}
               <tr>
-                <Td colSpan={1} style={{ height: '40px' }}>
+                <Td colSpan={1}>
                   <FormTextField />
                 </Td>
-                <Td colSpan={1} style={{ height: '40px' }}>
+                <Td colSpan={1}>
                   <FormTextField />
                 </Td>
-                <Td colSpan={1} style={{ height: '40px' }}>
+                <Td colSpan={1}>
                   <FormTextField />
                 </Td>
-                <Td colSpan={1} style={{ height: '40px' }}>
+                <Td colSpan={1}>
                   <FormTextField />
                 </Td>
-                <Td colSpan={3} style={{ height: '40px' }}>
+                <Td colSpan={3}>
                   <FormTextField />
                 </Td>
               </tr>
@@ -242,7 +259,7 @@ const SafetyInspectionFormTabContent = () => {
                   </small>
                 </Td>
                 <Td colSpan={2} rowSpan={2} style={{ verticalAlign: 'middle', textAlign: 'center' }}>
-                  {/* 사진 영역 */}
+                  <SafetyInspectionPhotoArea label='환기구' />
                 </Td>
                 <Td style={{ textAlign: 'center' }}>
                   <RadioGroup
@@ -314,11 +331,21 @@ const SafetyInspectionFormTabContent = () => {
                 </Td>
               </tr>
               <tr>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='정면' />
+                </Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='우측' />
+                </Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='배면' />
+                </Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='좌측' />
+                </Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='기타' />
+                </Td>
               </tr>
               <tr>
                 <Td><FormTextField /></Td>
@@ -350,9 +377,15 @@ const SafetyInspectionFormTabContent = () => {
                 <Th colSpan={2}>보수사유</Th>
               </tr>
               <tr>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='옹벽' />
+                </Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='석축' />
+                </Td>
+                <Td style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='사면' />
+                </Td>
                 <Td colSpan={2}>
                   <FormTextField multiline rows={3} />
                 </Td>
@@ -364,7 +397,7 @@ const SafetyInspectionFormTabContent = () => {
                   담장
                 </Td>
                 <Td colSpan={3} rowSpan={2} style={{ verticalAlign: 'middle', textAlign: 'center' }}>
-                  {/* 사진 영역 */}
+                  <SafetyInspectionPhotoArea label='담장' />
                 </Td>
                 <Th colSpan={2}>보수사유</Th>
               </tr>
@@ -381,14 +414,14 @@ const SafetyInspectionFormTabContent = () => {
                 </Td>
                 <Td style={{ textAlign: 'center' }}>점검로</Td>
                 <Td colSpan={3} style={{ textAlign: 'center' }}>
-                  {/* 사진 영역 */}
+                  <SafetyInspectionPhotoArea label='점검로' />
                 </Td>
                 <Th colSpan={2}>보수사유</Th>
               </tr>
               <tr>
                 <Td style={{ textAlign: 'center' }}>외부난간</Td>
                 <Td colSpan={3} style={{ textAlign: 'center' }}>
-                  {/* 사진 영역 */}
+                  <SafetyInspectionPhotoArea label='외부난간' />
                 </Td>
                 <Td colSpan={2}>
                   <FormTextField multiline rows={3} />
@@ -405,8 +438,12 @@ const SafetyInspectionFormTabContent = () => {
                 <Th colSpan={2}>보수사유</Th>
               </tr>
               <tr>
-                <Td colSpan={2} style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
-                <Td colSpan={1} style={{ textAlign: 'center' }}>{/* 사진 영역 */}</Td>
+                <Td colSpan={2} style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='천창' />
+                </Td>
+                <Td colSpan={1} style={{ textAlign: 'center' }}>
+                  <SafetyInspectionPhotoArea label='채광창' />
+                </Td>
                 <Td colSpan={2}>
                   <FormTextField multiline rows={3} />
                 </Td>
@@ -464,7 +501,7 @@ const SafetyInspectionFormTabContent = () => {
                   <tr>
                     {Array.from({ length: 7 }).map((_, i) => (
                       <Td key={`photo-${i}`} style={{ textAlign: 'center' }}>
-                        {/* 사진 영역 */}
+                        <SafetyInspectionPhotoArea label={`${floor.title}-${i + 1}`} />
                       </Td>
                     ))}
                   </tr>
