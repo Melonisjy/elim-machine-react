@@ -49,10 +49,10 @@ export async function login(email: string, password: string) {
 
     if (res.data.success && res.data.data) {
       // PHP API 응답 구조 확인
-      const responseData = res.data.data as any
+      const responseData = res.data.data
 
       // PHP API 응답 구조: jwtTokenRes.accessToken
-      const accessToken = responseData.jwtTokenRes?.accessToken
+      const accessToken = responseData.tokenResponseDto?.accessToken
 
       if (!accessToken) {
         console.error('로그인 응답에 accessToken이 없습니다:', responseData)
