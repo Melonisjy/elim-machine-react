@@ -107,13 +107,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           {'대시보드'}
         </MenuItem>
         <MenuSection label='기계설비점검'>
-          <MenuItem href={`/machine`} icon={<IconSettings />}>
+          <MenuItem disabled href={`/machine`} icon={<IconSettings />}>
             {'기계설비현장'}
           </MenuItem>
-          <MenuItem href={`/machine/engineer`} icon={<IconUsers />}>
+          <MenuItem disabled href={`/machine/engineer`} icon={<IconUsers />}>
             {'설비인력'}
           </MenuItem>
-          <MenuItem href={`/machine/template`} icon={<IconClipboard />}>
+          <MenuItem disabled href={`/machine/template`} icon={<IconClipboard />}>
             {'양식관리'}
           </MenuItem>
         </MenuSection>
