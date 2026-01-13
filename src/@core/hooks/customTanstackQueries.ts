@@ -8,7 +8,8 @@ import type { AxiosError } from 'axios'
 
 import { toast } from 'react-toastify'
 
-import { auth } from '@core/utils/auth' // 실제 auth 임포트 경로 사용
+import { auth, phpAuth } from '@core/utils/auth' // 실제 auth 임포트 경로 사용
+import type { PhpApiResult } from '@core/utils/auth'
 import { QUERY_KEYS } from '@/@core/data/queryKeys' // 실제 쿼리 키 임포트 경로 사용
 import type {
   EngineerBasicResponseDtoType,
@@ -53,6 +54,7 @@ import type {
   MemberOfficeDtoType,
   MemberPageDtoType,
   MemberPrivacyDtoType,
+  LoginLogPageResponseDtoType,
   PipeMeasurementResponseDtoType,
   SafetyProjectAttachmentCreateRequestDtoType,
   SafetyProjectAttachmentCreateResponseDtoType,
@@ -2270,5 +2272,40 @@ export const useMutateGuide = (machineProjectId: string) => {
       console.log(error)
       handleApiError(error)
     }
+  })
+}
+
+// ------------------------- 로그인 기록 관련 -------------------------
+// GET /api/web/audit/login-logs
+export const useGetLoginLogs = (queryParams: string) => {
+  const fetchLoginLogs: QueryFunction<LoginLogPageResponseDtoType, string[]> = useCallback(async data => {
+    const [keyType, queryParams] = data.queryKey
+
+    const params = new URLSearchParams(queryParams)
+
+    if (!params.has('size')) {
+      params.set('size', '15')
+    }
+    if (!params.has('page')) {
+      params.set('page', '1')
+    }
+
+    const response = await phpAuth
+      .get<PhpApiResult<LoginLogPageResponseDtoType>>(`/api/web/audit/login-logs?${params}`)
+      .then(v => {
+        if (v.data.success && v.data.data) {
+          return v.data.data
+        }
+        throw new Error(v.data.message || '로그인 기록 조회 실패')
+      })
+
+
+    return response
+  }, [])
+
+  return useQuery({
+    queryKey: QUERY_KEYS.LOGIN_LOG.GET_LOGIN_LOGS(queryParams),
+    queryFn: fetchLoginLogs,
+    staleTime: 1000 * 60 * 5 // 5분
   })
 }

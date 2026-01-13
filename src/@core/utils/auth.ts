@@ -47,7 +47,7 @@ const AUTH_ENDPOINTS = [
 export async function login(email: string, password: string): Promise<number> {
   try {
     // PHP 로그인 요청
-    const res = await phpAuth.post<PhpApiResult<LoginResponseDtoType>>('/api/authentication/web/login', {
+    const res = await phpAuth.post<PhpApiResult<LoginResponseDtoType>>('/api/web/auth/login', {
       email,
       password
     })
