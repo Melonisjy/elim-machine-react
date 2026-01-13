@@ -116,5 +116,8 @@ export const QUERY_KEYS = {
     GET_LICENSES_NAMES: ['GET_LICENSES_NAMES'],
     GET_LICENSES: (queryParams: string) => ['GET_LICENSES', refineParams(queryParams)],
     GET_LICENSE: (licenseId: string) => ['GET_LICENSE', licenseId]
+  },
+  LOGIN_LOG: {
+    GET_LOGIN_LOGS: (queryParams: string) => ['GET_LOGIN_LOGS', refineParams(queryParams)]
   }
 }
