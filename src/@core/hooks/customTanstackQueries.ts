@@ -2284,7 +2284,7 @@ export const useGetLoginLogs = (queryParams: string) => {
     const params = new URLSearchParams(queryParams)
 
     if (!params.has('size')) {
-      params.set('size', '20')
+      params.set('size', '15')
     }
     if (!params.has('page')) {
       params.set('page', '1')
