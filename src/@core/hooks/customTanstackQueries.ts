@@ -2276,7 +2276,7 @@ export const useMutateGuide = (machineProjectId: string) => {
 }
 
 // ------------------------- 로그인 기록 관련 -------------------------
-// GET /api/authentication/web/login-logs
+// GET /api/web/audit/login-logs
 export const useGetLoginLogs = (queryParams: string) => {
   const fetchLoginLogs: QueryFunction<LoginLogPageResponseDtoType, string[]> = useCallback(async data => {
     const [keyType, queryParams] = data.queryKey
@@ -2299,7 +2299,6 @@ export const useGetLoginLogs = (queryParams: string) => {
         throw new Error(v.data.message || '로그인 기록 조회 실패')
       })
 
-    console.log(`!!! queryFn ${keyType} ${params}:`)
 
     return response
   }, [])
