@@ -85,5 +85,15 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     tel: { label: '전화번호', canSort: false },
     contractDate: { label: '계약일', canSort: false, hideOnTablet: true },
     expireDate: { label: '만료일', canSort: false, hideOnTablet: true }
+  },
+  loginLog: {
+    regTime: { label: '로그인 시간', canSort: true },
+    name: { label: '이름', canSort: true },
+    email: { label: '이메일', canSort: true },
+    affiliation: { label: '소속', canSort: false },
+    mobile: { label: '휴대폰', canSort: false, hideOnTablet: true },
+    ipAddr: { label: 'IP 주소', canSort: false },
+    deviceType: { label: '기기', canSort: false },
+    success: { label: '성공 여부', canSort: false }
   }
 }
