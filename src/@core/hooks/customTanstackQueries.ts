@@ -2291,7 +2291,7 @@ export const useGetLoginLogs = (queryParams: string) => {
     }
 
     const response = await phpAuth
-      .get<PhpApiResult<LoginLogPageResponseDtoType>>(`/api/authentication/web/login-logs?${params}`)
+      .get<PhpApiResult<LoginLogPageResponseDtoType>>(`/api/web/audit/login-logs?${params}`)
       .then(v => {
         if (v.data.success && v.data.data) {
           return v.data.data
