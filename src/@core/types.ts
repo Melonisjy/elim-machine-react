@@ -41,6 +41,7 @@ export interface tableHeaderInfoType {
   machineInspection: HeaderType<MachineInspectionPageResponseDtoType>
   engineers: HeaderType<MachineEngineerPageResponseDtoType>
   licenses: HeaderType<LicensePageResponseDtoType>
+  loginLog: HeaderType<LoginLogDtoType>
 }
 
 /* -------------------------- InputInfo Type -------------------------- */
@@ -1500,6 +1501,27 @@ export interface TokenResponseDto {
   tokenType: string
   accessToken: string
   accessExp: number
+}
+
+// 로그인 기록
+export interface LoginLogDtoType {
+  seq: number
+  regTime: string
+  email: string
+  name: string
+  affiliation: string
+  mobile: string
+  countryCode: string
+  ipAddr: string
+  deviceType: string
+  success: 'Y' | 'N'
+}
+
+export interface LoginLogPageResponseDtoType {
+  items: LoginLogDtoType[]
+  total: number
+  page: number
+  size: number
 }
 
 // ----------- 공통 -----------
