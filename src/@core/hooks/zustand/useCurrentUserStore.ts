@@ -6,7 +6,7 @@ import { persist } from 'zustand/middleware'
 // 사용처: 반갑습니다 멘트에 들어가는 유저 이름, 클릭 시 나오는 유저 모달
 
 type UserInfoType = {
-  memberId: number
+  userId: number
   name: string
 } | null
 
@@ -18,7 +18,7 @@ interface CurrentUserState {
 
 const CurrentUserCreator: StateCreator<CurrentUserState> = set => ({
   // ⭐ 초기 상태 (State)
-  currentUser: { memberId: 0, name: '' },
+  currentUser: { userId: 0, name: '' },
 
   // ⭐ 액션 (Action)
   setCurrentUserName: (value: string) => {
