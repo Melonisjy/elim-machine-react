@@ -36,6 +36,7 @@ export type HeaderType<T> = Partial<Record<keyof T, HeaderInfoType>>
 
 export interface tableHeaderInfoType {
   member: HeaderType<MemberPageDtoType>
+  user: HeaderType<UserDtoType>
   machineProject: HeaderType<MachineProjectPageDtoType>
   safetyProject: HeaderType<SafetyProjectPageResponseDtoType>
   machineInspection: HeaderType<MachineInspectionPageResponseDtoType>
@@ -123,6 +124,33 @@ export type MemberPageDtoType = {
   memberStatusDescription: string
   genderDescription: string
 }
+
+// GET /api/web/audit/users (유저리스트 조회)
+export type UserDtoType = {
+  no: number,
+  userSeq: number,
+  role: string,
+  name: string,
+  staffNum: string,
+  affiliation: string,
+  department: string,
+  position: string,
+  age: number,
+  email: string,
+  mobile: string,
+  engineerYn: string,
+  joinDate: string,
+  tenureYears: number,
+  status: string,
+}
+
+export type UserResponseDtoType = {
+  items: UserDtoType[],
+  total: number,
+  page: number,
+  size: number,
+}
+
 
 // GET api/members/[memberId]
 export type MemberDetailResponseDtoType = {
