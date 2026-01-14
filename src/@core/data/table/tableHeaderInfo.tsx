@@ -18,6 +18,22 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     careerYear: { label: '근속년수', canSort: true, hideOnTablet: true },
     memberStatusDescription: { label: '상태', canSort: false, hideOnTablet: true }
   },
+  // NEW !!! 
+  user: {
+    name: { label: '이름', canSort: true },
+    staffNum: { label: '사번', canSort: false, hideOnTablet: true },
+    affiliation: { label: '소속', canSort: true },
+    department: { label: '부서', canSort: false },
+    position: { label: '직위', canSort: false },
+    age: { label: '나이', canSort: true },
+    email: { label: '이메일', canSort: true, hideOnTablet: true },
+    mobile: { label: '휴대폰', canSort: false, hideOnTablet: true },
+    joinDate: { label: '입사일', canSort: true, hideOnTablet: true },
+    tenureYears: { label: '근속년수', canSort: true, hideOnTablet: true },
+    status: { label: '상태', canSort: false, hideOnTablet: true }
+  },
+
+  
   machineProject: {
     projectStatusDescription: { label: '상태', canSort: false },
     region: { label: '지역', canSort: false },

@@ -119,5 +119,10 @@ export const QUERY_KEYS = {
   },
   LOGIN_LOG: {
     GET_LOGIN_LOGS: (queryParams: string) => ['GET_LOGIN_LOGS', refineParams(queryParams)]
+  },
+
+  // NEW !!!
+  USER: {
+    GET_USERS: (queryParams: string) => ['GET_USERS', refineParams(queryParams)]
   }
 }

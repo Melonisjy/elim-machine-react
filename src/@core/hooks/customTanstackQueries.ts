@@ -75,7 +75,8 @@ import type {
   SafetyProjectUpdateResponseDtoType,
   successResponseDtoType,
   targetType,
-  WindMeasurementResponseDtoType
+  WindMeasurementResponseDtoType,
+  UserResponseDtoType
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -2275,37 +2276,55 @@ export const useMutateGuide = (machineProjectId: string) => {
   })
 }
 
-// ------------------------- 로그인 기록 관련 -------------------------
-// GET /api/web/audit/login-logs
-export const useGetLoginLogs = (queryParams: string) => {
-  const fetchLoginLogs: QueryFunction<LoginLogPageResponseDtoType, string[]> = useCallback(async data => {
-    const [keyType, queryParams] = data.queryKey
+/* -------------------------------- PHP API -------------------------------- */
 
-    const params = new URLSearchParams(queryParams)
+const createPhpApiQueryHook = <T>(
+  endpoint: string,
+  queryKey: (queryParams: string) => string[],
+  errorMessage: string
+) => {
+  return (queryParams: string) => {
+    const fetchData: QueryFunction<T, string[]> = useCallback(async data => {
+      const [keyType, queryParams] = data.queryKey
+      const params = new URLSearchParams(queryParams)
 
-    if (!params.has('size')) {
-      params.set('size', '15')
-    }
-    if (!params.has('page')) {
-      params.set('page', '1')
-    }
+      if (!params.has('size')) {
+        params.set('size', '15')
+      }
 
-    const response = await phpAuth
-      .get<PhpApiResult<LoginLogPageResponseDtoType>>(`/api/web/audit/login-logs?${params}`)
-      .then(v => {
-        if (v.data.success && v.data.data) {
-          return v.data.data
+      params.set('page', String(Number(params.get('page') ?? 0) + 1))
+
+      const response: T = await phpAuth
+        .get<PhpApiResult<T>>(`${endpoint}?${params}`)
+        .then(v => {
+          if (v.data.success && v.data.data) {
+            return v.data.data
         }
-        throw new Error(v.data.message || '로그인 기록 조회 실패')
-      })
+      throw new Error(v.data.message || errorMessage)})
 
+      console.log(`!!! queryFn ${keyType} ${params}:`)
+      return response
+    }, [])
 
-    return response
-  }, [])
-
-  return useQuery({
-    queryKey: QUERY_KEYS.LOGIN_LOG.GET_LOGIN_LOGS(queryParams),
-    queryFn: fetchLoginLogs,
-    staleTime: 1000 * 60 * 5 // 5분
-  })
+    return useQuery({
+      queryKey: queryKey(queryParams),
+      queryFn: fetchData,
+      staleTime: 1000 * 60 * 5 // 5분
+    })
+  }
 }
+
+// GET /api/web/audit/login-logs
+export const useGetLoginLogs = createPhpApiQueryHook<LoginLogPageResponseDtoType>(
+  '/api/web/audit/login-logs',
+  QUERY_KEYS.LOGIN_LOG.GET_LOGIN_LOGS,
+  '로그인 기록 조회 실패'
+)
+
+
+// GET /api/web/audit/users
+export const useGetUsers = createPhpApiQueryHook<UserResponseDtoType>(
+  '/api/web/audit/users',
+  QUERY_KEYS.USER.GET_USERS,
+  '직원 조회 실패'
+)

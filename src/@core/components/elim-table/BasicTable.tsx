@@ -13,6 +13,7 @@ import classNames from 'classnames'
 
 import type { TableCellProps } from '@mui/material'
 import { Checkbox, Divider, ListItemIcon, Menu, MenuItem, styled, TableCell, Typography } from '@mui/material'
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
 
 import { IconCaretDownFilled, IconCaretUpFilled, IconExclamationCircleFilled } from '@tabler/icons-react'
 
@@ -185,15 +186,19 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                   sx={isTablet ? { p: 0, py: 2, px: 1 } : {}}
                   onClick={!(loading || error) && header[k]?.canSort ? () => handleSorting(key) : undefined}
                 >
-                  {header[k]?.label}
-                  {header[k]?.canSort &&
-                    sort &&
-                    sort[0] === k &&
-                    (sort[1] === 'desc' ? (
-                      <IconCaretDownFilled color='gray' className='absolute text-xl top-[50%] -translate-y-1/2' />
-                    ) : (
-                      <IconCaretUpFilled color='gray' className='absolute text-xl top-[50%] -translate-y-1/2' />
-                    ))}
+                  <div className='flex items-center justify-center gap-1'>
+                    {header[k]?.label}
+                    {header[k]?.canSort &&
+                      (sort && sort[0] === k ? (
+                        sort[1] === 'desc' ? (
+                          <IconCaretDownFilled color='gray' size={18} />
+                        ) : (
+                          <IconCaretUpFilled color='gray' size={18} />
+                        )
+                      ) : (
+                        <UnfoldMoreIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
+                      ))}
+                  </div>
                 </StyledTableCell>
               )
             })}
