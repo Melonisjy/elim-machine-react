@@ -1490,9 +1490,10 @@ export const useGetUsers = (queryParams: string) => {
     if (!params.has('size')) {
       params.set('size', '15')
     }
-    if (!params.has('page')) {
-      params.set('page', '1')
-    }
+
+    params.set('page', String(Number(params.get('page') ?? 0) + 1))
+
+    
 
     const response: UserResponseDtoType = await phpAuth
       .get<PhpApiResult<UserResponseDtoType>>(`/api/web/audit/users?${params}`)
@@ -2322,9 +2323,8 @@ export const useGetLoginLogs = (queryParams: string) => {
     if (!params.has('size')) {
       params.set('size', '15')
     }
-    if (!params.has('page')) {
-      params.set('page', '1')
-    }
+    
+    params.set('page', String(Number(params.get('page') ?? 0) + 1))
 
     const response = await phpAuth
       .get<PhpApiResult<LoginLogPageResponseDtoType>>(`/api/web/audit/login-logs?${params}`)
