@@ -75,7 +75,8 @@ import type {
   SafetyProjectUpdateResponseDtoType,
   successResponseDtoType,
   targetType,
-  WindMeasurementResponseDtoType
+  WindMeasurementResponseDtoType,
+  UserResponseDtoType
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -1475,6 +1476,41 @@ export const useGetMembers = (queryParams: string) => {
   return useQuery({
     queryKey: QUERY_KEYS.MEMBER.GET_MEMBERS(queryParams),
     queryFn: fetchMembers,
+    staleTime: 1000 * 60 * 5 // 5분
+  })
+}
+
+// NEW !!!
+export const useGetUsers = (queryParams: string) => {
+  const fetchUsers: QueryFunction<UserResponseDtoType, string[]> = useCallback(async data => {
+    const [keyType, queryParams] = data.queryKey
+
+    const params = new URLSearchParams(queryParams)
+
+    if (!params.has('size')) {
+      params.set('size', '15')
+    }
+    if (!params.has('page')) {
+      params.set('page', '1')
+    }
+
+    const response: UserResponseDtoType = await phpAuth
+      .get<PhpApiResult<UserResponseDtoType>>(`/api/web/audit/users?${params}`)
+      .then(v => {
+        if (v.data.success && v.data.data) {
+          return v.data.data
+        }
+        throw new Error(v.data.message || '직원 조회 실패')
+      })
+
+    console.log(`!!! queryFn ${keyType} ${params}:`)
+
+    return response
+  }, [])
+
+  return useQuery({
+    queryKey: QUERY_KEYS.USER.GET_USERS(queryParams),
+    queryFn: fetchUsers,
     staleTime: 1000 * 60 * 5 // 5분
   })
 }
