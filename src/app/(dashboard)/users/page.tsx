@@ -48,9 +48,9 @@ export default function UsersPage() {
 
   const queryClient = useQueryClient()
 
-  const { data: membersPages, refetch: refetchPages, isLoading, isError } = useGetUsers(searchParams.toString())
+  const { data: usersPages, refetch: refetchPages, isLoading, isError } = useGetUsers(searchParams.toString())
 
-  const data = membersPages?.items ?? []
+  const data = usersPages?.items ?? []
 
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
@@ -59,7 +59,7 @@ export default function UsersPage() {
 
   const disabled = isLoading || isError
 
-  const totalCount = membersPages?.total ?? 0
+  const totalCount = usersPages?.total ?? 0
 
   // 모달 관련 상태
   const [addUserModalOpen, setAddUserModalOpen] = useState(false)
@@ -113,7 +113,7 @@ export default function UsersPage() {
       predicate(query) {
         const key = query.queryKey
 
-        return Array.isArray(key) && key[0] === 'GET_MEMBERS' && key[1] !== searchParams.toString() // 스크롤 유지를 위해 현재 data는 refetch, 나머지는 캐시 지우기
+        return Array.isArray(key) && key[0] === 'GET_USERS' && key[1] !== searchParams.toString() // 스크롤 유지를 위해 현재 data는 refetch, 나머지는 캐시 지우기
       }
     })
   }, [refetchPages, queryClient, searchParams])
@@ -164,14 +164,8 @@ export default function UsersPage() {
     }
   }
 
-  const isChecked = (user: UserDtoType) => {
-    let exist = false
-
-    checked.forEach(v => {
-      if (JSON.stringify(v) === JSON.stringify({ memberId: user.userSeq })) exist = true
-    })
-
-    return exist
+  const isChecked = (user: UserDtoType) => {    
+    return checked.some(v => v.memberId === user.userSeq)
   }
 
   // 여러 유저 한번에 삭제
@@ -179,7 +173,7 @@ export default function UsersPage() {
     if (!checked.length) return
 
     try {
-      await auth.delete(`/api/members`, {
+      await auth.delete(`/api/web/audit/users`, {
         //@ts-ignore
         data: { memberDeleteRequestDtos: checked }
       })
@@ -197,7 +191,7 @@ export default function UsersPage() {
   const handleDeleteUser = useCallback(
     async (user: UserDtoType) => {
       try {
-        await auth.delete(`/api/members/${user.userSeq}`, {
+        await auth.delete(`/api/web/audit/users/${user.userSeq}`, {
           //@ts-ignore
           data: { memberId: user.userSeq }
         })
@@ -327,7 +321,6 @@ export default function UsersPage() {
             header={TABLE_HEADER_INFO.user}
             data={data}
             handleRowClick={handleUserClick}
-            multiException={{ age: ['age'] }}
             loading={isLoading}
             error={isError}
             showCheckBox={showCheckBox}
