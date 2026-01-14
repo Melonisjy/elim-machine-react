@@ -293,7 +293,7 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     <StyledTableCell size={isMobile ? 'small' : 'medium'}>
                       <Checkbox
                         sx={{ padding: 0 }}
-                        disabled={(info as any)?.memberId === currentUserId}
+                        disabled={(info as any)?.userId === currentUserId}
                         checked={isChecked(info)}
                       />
                     </StyledTableCell>
