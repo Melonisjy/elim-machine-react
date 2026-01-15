@@ -7,10 +7,10 @@ import {
   officePositionOption,
   workFormOption
 } from '@/@core/data/options'
-import type { memberInputInfoType } from '../../types'
+import type { userInputInfoType } from '../../types'
 
 // 직원 상세 페이지
-export const MEMBER_INPUT_INFO: memberInputInfoType = {
+export const MEMBER_INPUT_INFO: userInputInfoType = {
   basic: {
     name: {
       size: 'md',
@@ -22,26 +22,26 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'text',
       label: '이메일'
     },
-    companyName: {
+    licenseName: {
       size: 'md',
       type: 'multi',
       label: '소속',
       options: companyNameOption
     },
-    memberStatus: {
+    status: {
       size: 'md',
       type: 'multi',
       label: '재직 상태',
       options: memberStatusOption
     },
-    note: {
+    remark: {
       size: 'lg',
       type: 'long text',
       label: '비고'
     }
   },
   privacy: {
-    foreignYn: {
+    nationality: {
       size: 'md',
       type: 'yn',
       label: '외국인 여부'
@@ -61,12 +61,12 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'text',
       label: '전화번호'
     },
-    emerNum1: {
+    emergency1: {
       size: 'md',
       type: 'text',
       label: '비상연락처1'
     },
-    emerNum2: {
+    emergency2: {
       size: 'md',
       type: 'text',
       label: '비상연락처2'
@@ -81,16 +81,16 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'text',
       label: '종교'
     },
-    roadAddress: {
+    address: {
       size: 'lg',
       type: 'map',
       label: '도로명 주소'
     },
-    detailAddress: {
-      size: 'lg',
-      type: 'text',
-      label: '상세 주소'
-    },
+    // detailAddress: {
+    //   size: 'lg',
+    //   type: 'text',
+    //   label: '상세 주소'
+    // },
     educationLevel: {
       size: 'md',
       type: 'text',
@@ -101,7 +101,7 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'text',
       label: '전공'
     },
-    carYn: {
+    carOwned: {
       size: 'md',
       type: 'yn',
       label: '차량 보유 여부'
@@ -128,13 +128,13 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'text',
       label: '사번'
     },
-    officeDepartmentName: {
+    department: {
       size: 'md',
       type: 'multi', // 다중 선택 가능
       label: '부서',
       options: officeDepartmentNameOption
     },
-    officePosition: {
+    position: {
       size: 'md',
       type: 'multi', // 다중 선택 가능
       label: '직위',
@@ -159,7 +159,7 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
     laborForm: {
       size: 'md',
       type: 'multi', // 다중 선택 가능
-      label: '상근/비상근',
+      label: '근로형태',
       options: [
         { value: 'RESIDENT', label: '상근' },
         { value: 'NON_RESIDENT', label: '비상근' }
@@ -191,24 +191,24 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'date',
       label: '퇴사일'
     },
-    insuranceAcquisitionDate: {
+    insurancesAcquisitionDate: {
       size: 'md',
       type: 'date',
       label: '보험 취득일'
     },
-    insuranceLostDate: {
+    insurancesLossDate: {
       size: 'md',
       type: 'date',
       label: '보험 상실일'
     },
-    groupInsuranceYn: {
-      size: 'md',
-      type: 'yn',
-      label: '단체보험 가입여부'
-    }
+    // groupInsuranceYn: {
+    //   size: 'md',
+    //   type: 'yn',
+    //   label: '단체보험 가입여부'
+    // }
   },
   career: {
-    grade: {
+    jobGrade: {
       size: 'md',
       type: 'multi', // 다중 선택 가능
       label: '등급',
@@ -220,72 +220,88 @@ export const MEMBER_INPUT_INFO: memberInputInfoType = {
       type: 'text',
       label: '직무분야'
     },
-    industrySameMonth: {
-      size: 'md',
-      type: 'number',
-      label: '동종업계 경력(월)'
-    },
-    industryOtherMonth: {
-      size: 'md',
-      type: 'number',
-      label: '타업계 경력(월)'
-    },
-    licenseName1: {
+    preJoinExperienceMonth: {
+        industrySameMonth: {
+          size: 'md',
+          type: 'number',
+          label: '동종업계 경력(월)'
+        },
+        industryOtherMonth: {
+          size: 'md',
+          type: 'number',
+          label: '타업계 경력(월)'
+        }
+      },
+    certNum1: {
       size: 'md',
       type: 'text',
       label: '자격증1'
     },
-    licenseName2: {
+    certNum2: {
       size: 'md',
       type: 'text',
       label: '자격증2'
     }
   },
   etc: {
-    employedType: {
+    benefits: {
+      youthJobLeap: {
+        size: 'md',
+        type: 'text',
+        label: '청년 일자리 도약'
+      },
+      youthEmploymentIncentive: {
+        size: 'md',
+        type: 'text',
+        label: '청년 채용 특별 장려금'
+      },
+      youthDigital: {
+        size: 'md',
+        type: 'text',
+        label: '청년 디지털'
+      },
+      seniorInternship: {
+        size: 'md',
+        type: 'text',
+        label: '시니어 인턴십'
+      },
+      newMiddleAgedJobs: {
+        size: 'md',
+        type: 'text',
+        label: '신중년 적합직무'
+      }
+    },
+    incomeTaxReduction: {
+      beginDate: {
+        size: 'md',
+        type: 'date',
+        label: '소득세 감면 시작일'
+      },
+      endDate: {
+        size: 'md',
+        type: 'date',
+        label: '소득세 감면 종료일'
+      },
+      employedType: {
+        size: 'md',
+        type: 'text',
+        label: '취업자 유형'
+      },
+      militaryPeriod: {
+        size: 'md',
+        type: 'text',
+        label: '군복무 기간'
+      }
+    },
+    registeredAt: {
       size: 'md',
       type: 'text',
-      label: '취업자 유형'
+      label: '등록일'
     },
-    incomeTaxReducedBeginDate: {
-      size: 'md',
-      type: 'date',
-      label: '소득세 감면 시작일'
-    },
-    incomeTaxReducedEndDate: {
-      size: 'md',
-      type: 'date',
-      label: '소득세 감면 종료일'
-    },
-    militaryPeriod: {
+    lastLoginAt: {
       size: 'md',
       type: 'text',
-      label: '군복무 기간'
-    },
-    newMiddleAgedJobs: {
-      size: 'md',
-      type: 'text',
-      label: '신중년 적합직무'
-    },
-    seniorInternship: {
-      size: 'md',
-      type: 'text',
-      label: '시니어 인턴십'
-    },
-    youthDigital: {
-      size: 'md',
-      type: 'text',
-      label: '청년 디지털'
-    },
-    youthEmploymentIncentive: {
-      size: 'md',
-      type: 'text',
-      label: '청년 채용 특별 장려금'
-    },
-    youthJobLeap: {
-      size: 'md',
-      type: 'text',
-      label: '청년 일자리 도약'
+      label: '최종 로그인일'
     }
   }
 }

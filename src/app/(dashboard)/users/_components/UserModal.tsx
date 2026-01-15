@@ -21,12 +21,12 @@ import TabContext from '@mui/lab/TabContext'
 
 import { IconX } from '@tabler/icons-react'
 
-import type { MemberDetailResponseDtoType } from '@core/types'
+import type {  UserDetailResponseDtoType } from '@core/types'
 
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import DeleteModal from '@/@core/components/elim-modal/DeleteModal'
 import { auth } from '@core/utils/auth'
-import type { MemberType } from '@core/hooks/customTanstackQueries'
+import type {  UserType } from '@core/hooks/customTanstackQueries'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import AlertModal from '@/@core/components/elim-modal/AlertModal'
 import BasicTabContent from './tabs/BasicTabContent'
@@ -47,9 +47,9 @@ export type refType = {
 
 type requestRuleBodyType = {
   url: string
-  value: MemberType
+  value: UserType
   label: string
-  dtoKey: keyof MemberDetailResponseDtoType
+  dtoKey: keyof UserDetailResponseDtoType
 }
 
 type tabType = '1' | '2' | '3' | '4' | '5'
@@ -59,43 +59,43 @@ const requestRule: Record<tabType, requestRuleBodyType> = {
     url: '',
     label: '기본정보',
     value: 'basic',
-    dtoKey: 'memberBasicResponseDto'
+    dtoKey: 'userBasicResponseDto'
   },
   '2': {
-    url: '/member-privacy',
+    url: '/user-privacy',
     label: '개인정보',
     value: 'privacy',
-    dtoKey: 'memberPrivacyResponseDto'
+    dtoKey: 'userPrivacyResponseDto'
   },
   '3': {
-    url: '/member-office',
+    url: '/user-office',
     label: '재직정보',
     value: 'office',
-    dtoKey: 'memberOfficeResponseDto'
+    dtoKey: 'userOfficeResponseDto'
   },
   '4': {
-    url: '/member-career',
+    url: '/user-career',
     label: '경력정보',
     value: 'career',
-    dtoKey: 'memberCareerResponseDto'
+    dtoKey: 'userCareerResponseDto'
   },
   '5': {
-    url: '/member-etc',
+    url: '/user-etc',
     label: '기타정보',
     value: 'etc',
-    dtoKey: 'memberEtcResponseDto'
+    dtoKey: 'userEtcResponseDto'
   }
 }
 
 type EditUserInfoProps = {
   open: boolean
   setOpen: (open: boolean) => void
-  selectedUserData: MemberDetailResponseDtoType
+  selectedUserData: UserDetailResponseDtoType
   onDelete?: () => void
   reloadPages?: () => void
 }
 
-export const MemberIdContext = createContext<number>(0)
+export const UserIdContext = createContext<number>(0)
 const savedTabsContext = createContext<RefObject<string[]> | null>(null)
 
 /**
@@ -137,23 +137,24 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
     )
   }, [])
 
-  const memberId = { ...selectedUserData?.memberBasicResponseDto }.memberId
+  const userId = selectedUserData.userId
 
   // 로그인한 사용자의 userModal인지 파악
-  const currentuserId = useCurrentUserStore(set => set.currentUser)?.memberId
-  const isYours = selectedUserData.memberBasicResponseDto.memberId === currentuserId
+  const currentuserId = useCurrentUserStore(set => set.currentUser)?.userId
+  const isYours = userId === currentuserId
 
+
+
+  // else 문 추가 필요
   const handleDeleteUser = async () => {
-    const version = selectedUserData.memberBasicResponseDto?.version
-
-    if (version !== undefined && memberId !== undefined) {
+    if (userId !== undefined) {
       try {
         await auth.delete(`/api/members`, {
           // @ts-ignore
           data: { memberDeleteRequestDtos: [{ memberId: memberId, version: version }] }
         })
 
-        console.log(`memberId: ${memberId} user is deleted successfully`)
+        console.log(`memberId: ${userId} user is deleted successfully`)
         handleSuccess('해당 직원이 삭제되었습니다.')
         onDelete && onDelete()
         changedEvenOnce.current = true
@@ -161,8 +162,6 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
       } catch (error) {
         handleApiError(error)
       }
-    } else {
-      handleApiError(version, '버전 혹은 memberId가 없습니다.')
     }
   }
 
@@ -247,7 +246,7 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
   }, [])
 
   return (
-    <MemberIdContext.Provider value={memberId ?? 0}>
+    <UserIdContext.Provider value={userId ?? 0}>
       <savedTabsContext.Provider value={savedTabs}>
         <Dialog
           onClose={(_, reason) => {
@@ -261,9 +260,9 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
           <DialogTitle sx={{ position: 'relative' }}>
             <div className='flex flex-col w-full grid place-items-center'>
               <Typography variant='h3'>
-                {selectedUserData?.memberBasicResponseDto?.name || '사용자 정보 수정'}
+                {selectedUserData?.userBasicResponseDto?.name || '사용자 정보 수정'}
               </Typography>
-              <Typography variant='subtitle1'>{selectedUserData?.memberBasicResponseDto?.companyName || ''}</Typography>
+              <Typography variant='subtitle1'>{selectedUserData?.userBasicResponseDto?.licenseName || ''}</Typography>
             </div>
             <div className='absolute left-8 top-6'>
               <div className='flex gap-3'>
@@ -321,19 +320,19 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
                 </TabList>
                 <div className='flex-1 overflow-y-auto pt-5'>
                   <TabPanel value='1' keepMounted>
-                    <BasicTabContent ref={basicTabRef} defaultData={selectedUserData.memberBasicResponseDto} />
+                    <BasicTabContent ref={basicTabRef} defaultData={selectedUserData.userBasicResponseDto} />
                   </TabPanel>
                   <TabPanel value='2' keepMounted>
-                    <PrivacyTabContent ref={privacyTabRef} defaultData={selectedUserData.memberPrivacyResponseDto} />
+                    <PrivacyTabContent ref={privacyTabRef} defaultData={selectedUserData.userPrivacyResponseDto} />
                   </TabPanel>
                   <TabPanel value='3' keepMounted>
-                    <OfficeTabContent ref={officeTabRef} defaultData={selectedUserData.memberOfficeResponseDto} />
+                    <OfficeTabContent ref={officeTabRef} defaultData={selectedUserData.userOfficeResponseDto} />
                   </TabPanel>
                   <TabPanel value='4' keepMounted>
-                    <CareerTabContent ref={careerTabRef} defaultData={selectedUserData.memberCareerResponseDto} />
+                    <CareerTabContent ref={careerTabRef} defaultData={selectedUserData.userCareerResponseDto} />
                   </TabPanel>
                   <TabPanel value='5' keepMounted>
-                    <EtcTabContent ref={etcTabRef} defaultData={selectedUserData.memberEtcResponseDto} />
+                    <EtcTabContent ref={etcTabRef} defaultData={selectedUserData.userEtcResponseDto} />
                   </TabPanel>
                 </div>
               </div>
@@ -364,11 +363,11 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
           <ForgotPwModal
             open={openForgetPW}
             setOpen={setOpenForgotPW}
-            userEmail={selectedUserData.memberBasicResponseDto.email}
+            userEmail={selectedUserData.userBasicResponseDto.email}
           />
         )}
       </savedTabsContext.Provider>
-    </MemberIdContext.Provider>
+    </UserIdContext.Provider>
   )
 }
 

@@ -123,6 +123,7 @@ export const QUERY_KEYS = {
 
   // NEW !!!
   USER: {
+    GET_SINGLE_USER: (userId: string) => ['GET_SINGLE_USER', userId],
     GET_USERS: (queryParams: string) => ['GET_USERS', refineParams(queryParams)]
   }
 }

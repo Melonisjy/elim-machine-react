@@ -88,7 +88,7 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
 
-  const currentUserId = useCurrentUserStore(set => set.currentUser)?.memberId
+  const currentUserId = useCurrentUserStore(set => set.currentUser)?.userId
 
   const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number; row: T } | null>(null)
 
@@ -293,7 +293,7 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     <StyledTableCell size={isMobile ? 'small' : 'medium'}>
                       <Checkbox
                         sx={{ padding: 0 }}
-                        disabled={(info as any)?.memberId === currentUserId}
+                        disabled={(info as any)?.userId === currentUserId}
                         checked={isChecked(info)}
                       />
                     </StyledTableCell>

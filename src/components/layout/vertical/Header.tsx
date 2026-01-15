@@ -20,7 +20,7 @@ export default function Header() {
   const currentUser = useCurrentUserStore(set => set.currentUser)
 
   function UserModalContainer() {
-    const { data: userData } = useGetSingleMember((currentUser?.memberId ?? 0).toString())
+    const { data: userData } = useGetSingleMember((currentUser?.userId ?? 0).toString())
 
     return userData && <UserModal open={openUser} setOpen={setOpenUser} selectedUserData={userData} />
   }

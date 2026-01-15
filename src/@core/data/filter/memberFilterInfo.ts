@@ -2,19 +2,19 @@ import { MEMBER_INPUT_INFO } from '../input/memberInputInfo'
 import type { InputFieldType, MemberFilterType } from '../../types'
 import { birthMonthOption, careerYearOption, genderOption } from '@/@core/data/options'
 
-const { companyName, memberStatus } = MEMBER_INPUT_INFO.basic
-const { officePosition, officeDepartmentName, contractType, laborForm, workForm } = MEMBER_INPUT_INFO.office
-const { foreignYn } = MEMBER_INPUT_INFO.privacy
+const { licenseName, status } = MEMBER_INPUT_INFO.basic
+const { position, department, contractType, laborForm, workForm } = MEMBER_INPUT_INFO.office
+const { nationality } = MEMBER_INPUT_INFO.privacy
 
 export const MEMBER_FILTER_INFO: Record<keyof MemberFilterType, InputFieldType> = {
   // role: role!,
-  companyName: companyName!,
-  officeDepartmentName: officeDepartmentName!,
-  officePosition: officePosition!,
+  licenseName: licenseName!,
+  department: department!,
+  position: position!,
   contractType: contractType!,
   laborForm: laborForm!,
   workForm: workForm!,
-  foreignYn: foreignYn!,
+  nationality: nationality!,
   gender: {
     type: 'multi',
     label: '성별',
@@ -25,7 +25,7 @@ export const MEMBER_FILTER_INFO: Record<keyof MemberFilterType, InputFieldType> 
     label: '근속년수',
     options: careerYearOption
   },
-  memberStatus: memberStatus!,
+  status: status!,
   birthMonth: {
     type: 'multi',
     label: '생일',

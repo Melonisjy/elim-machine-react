@@ -1,34 +1,34 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useContext, useImperativeHandle } from 'react'
 
 import { DialogContent, Grid2 } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
 
-import type { MemberOfficeDtoType } from '@core/types'
+import type { UserOfficeDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
 import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
-import { useSavedTabsContext, type refType } from '../UserModal'
+import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
 
 interface OfficeTabContentProps {
-  defaultData: MemberOfficeDtoType
+  defaultData: UserOfficeDtoType
 }
 
 const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultData }, ref) => {
-  const memberId = defaultData.memberId
+  const userId = useContext(UserIdContext)
 
-  const { mutateAsync: mutateOfficeAsync } = useMutateSingleMember<MemberOfficeDtoType>(memberId.toString(), 'office')
+  const { mutateAsync: mutateOfficeAsync } = useMutateSingleMember<UserOfficeDtoType>(userId.toString(), 'office')
 
   const savedTabs = useSavedTabsContext()
 
-  const form = useForm<MemberOfficeDtoType>({
+  const form = useForm<UserOfficeDtoType>({
     defaultValues: {
       ...defaultData,
       staffNum: defaultData.staffNum ?? '',
-      officeDepartmentName: defaultData.officeDepartmentName ?? '',
-      officePosition: defaultData.officePosition ?? '',
+      department: defaultData.department ?? '',
+      position: defaultData.position ?? '',
       apprentice: defaultData.apprentice ?? '',
       contractType: defaultData.contractType ?? '',
       contractYn: defaultData.contractYn ?? '',
@@ -38,9 +38,9 @@ const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultDa
       staffCardYn: defaultData.staffCardYn ?? '',
       joinDate: defaultData.joinDate ?? '',
       resignDate: defaultData.resignDate ?? '',
-      insuranceAcquisitionDate: defaultData.insuranceAcquisitionDate ?? '',
-      insuranceLostDate: defaultData.insuranceLostDate ?? '',
-      groupInsuranceYn: defaultData.groupInsuranceYn ?? ''
+      insurancesAcquisitionDate: defaultData.insurancesAcquisitionDate ?? '',
+      insurancesLossDate: defaultData.insurancesLossDate ?? '',
+      // groupInsuranceYn: defaultData.groupInsuranceYn ?? ''
     }
   })
 
@@ -55,8 +55,8 @@ const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultDa
       form.reset({
         ...newOffice,
         staffNum: newOffice.staffNum ?? '',
-        officeDepartmentName: newOffice.officeDepartmentName ?? '',
-        officePosition: newOffice.officePosition ?? '',
+        department: newOffice.department ?? '',
+        position: newOffice.position ?? '',
         apprentice: newOffice.apprentice ?? '',
         contractType: newOffice.contractType ?? '',
         contractYn: newOffice.contractYn ?? '',
@@ -66,9 +66,9 @@ const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultDa
         staffCardYn: newOffice.staffCardYn ?? '',
         joinDate: newOffice.joinDate ?? '',
         resignDate: newOffice.resignDate ?? '',
-        insuranceAcquisitionDate: newOffice.insuranceAcquisitionDate ?? '',
-        insuranceLostDate: newOffice.insuranceLostDate ?? '',
-        groupInsuranceYn: newOffice.groupInsuranceYn ?? ''
+        insurancesAcquisitionDate: newOffice.insurancesAcquisitionDate ?? '',
+        insurancesLossDate: newOffice.insurancesLossDate ?? '',
+        // groupInsuranceYn: newOffice.groupInsuranceYn ?? ''
       })
 
       console.log('office 정보 수정 완료')
@@ -89,8 +89,8 @@ const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultDa
     <DialogContent className='overflow-visible pbs-0 sm:pli-16'>
       <Grid2 container spacing={3} columns={2} columnSpacing={5}>
         <TextInputBox name='staffNum' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
-        <MultiInputBox name='officeDepartmentName' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
-        <MultiInputBox name='officePosition' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
+        <MultiInputBox name='department' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
+        <MultiInputBox name='position' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
         <TextInputBox name='apprentice' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
         <MultiInputBox name='contractType' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
         <MultiInputBox name='contractYn' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
@@ -102,13 +102,13 @@ const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultDa
         <TextInputBox type='date' name='resignDate' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
         <TextInputBox
           type='date'
-          name='insuranceAcquisitionDate'
+          name='insurancesAcquisitionDate'
           form={form}
           labelMap={MEMBER_INPUT_INFO.office}
           column={1}
         />
-        <TextInputBox type='date' name='insuranceLostDate' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
-        <MultiInputBox name='groupInsuranceYn' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
+        <TextInputBox type='date' name='insurancesLossDate' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} />
+        {/* <MultiInputBox name='groupInsuranceYn' form={form} labelMap={MEMBER_INPUT_INFO.office} column={1} /> */}
       </Grid2>
     </DialogContent>
   )

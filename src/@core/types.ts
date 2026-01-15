@@ -68,6 +68,36 @@ export type memberInputInfoType = {
   etc: InputInfoType<MemberEtcDtoType>
 }
 
+// php
+export type userInputInfoType = {
+  basic: InputInfoType<UserBasicDtoType>
+  privacy: InputInfoType<UserPrivacyDtoType>
+  office: InputInfoType<UserOfficeDtoType>
+  career: Omit<InputInfoType<UserCareerDtoType>, 'preJoinExperienceMonth'> & {
+    preJoinExperienceMonth?: {
+      industrySameMonth?: InputFieldType
+      industryOtherMonth?: InputFieldType
+    }
+  }
+  etc: Omit<InputInfoType<UserEtcDtoType>, 'benefits' | 'incomeTaxReduction'> & {
+    benefits?: {
+      youthJobLeap?: InputFieldType
+      youthEmploymentIncentive?: InputFieldType
+      youthDigital?: InputFieldType
+      seniorInternship?: InputFieldType
+      newMiddleAgedJobs?: InputFieldType
+    }
+    incomeTaxReduction?: {
+      beginDate?: InputFieldType
+      endDate?: InputFieldType
+      employedType?: InputFieldType
+      militaryPeriod?: InputFieldType
+    }
+    registeredAt?: InputFieldType
+    lastLoginAt?: InputFieldType
+  }
+}
+
 // machine-projects/[id] 인풋 정보 형식
 export type machineProjectInputInfoType = InputInfoType<MachineProjectResponseDtoType>
 
@@ -151,6 +181,128 @@ export type UserResponseDtoType = {
   size: number,
 }
 
+// GET /api/web/users/{userId}
+export type UserDetailResponseDtoType = {
+  userId: number
+  userBasicResponseDto: UserBasicDtoType
+  userCareerResponseDto: UserCareerDtoType
+  userEtcResponseDto: UserEtcDtoType
+  userOfficeResponseDto: UserOfficeDtoType
+  userPrivacyResponseDto: UserPrivacyDtoType
+}
+
+export type PermissionKey = 
+| 'customer_menu'
+| 'customer_detail'
+| 'fms_id_manage'
+| 'contract_menu'
+| 'counseling_menu'
+| 'income_view'
+
+export interface UserBasicDtoType {
+  licenseName: string
+  name: string
+  role: string
+  status: string
+  email: string
+  avatarFileName: string
+  remark: string
+  permission: Record<PermissionKey, ynResultType>
+}
+
+export interface UserPrivacyDtoType {
+  nationality: string
+  juminNum: string
+  birthday: string
+  phoneNumber: string
+  emergency1: string
+  emergency2: string | null
+  address: string
+  educationLevel: string
+  educationMajor: string
+  familyCnt: number
+  carOwned: ynResultType
+  carNumber: string
+  suwonCarReg: number
+  carModel: string
+  religion: string
+  bankName: string
+  bankNumber: string
+}
+
+export interface UserOfficeDtoType {
+  staffNum: string
+  department: string
+  team: string
+  task: string
+  position: string
+  contractType: string
+  apprentice: string
+  workForm: string
+  laborForm: string
+  joinDate: string
+  resignDate: string | null
+  insurancesAcquisitionDate: string
+  insurancesLossDate: string | null
+  years: number
+  contractYn: ynResultType
+  staffCardYn: ynResultType
+  fieldworkYn: ynResultType
+}
+
+export interface UserCareerDtoType {
+  jobField: string
+  jobGrade: string
+  certNum1: string
+  certNum2: string
+  preJoinExperienceMonth: {
+    industrySameMonth: number
+    industryOtherMonth: number
+  }
+}
+
+export type BenefitKey = 
+| 'youthJobLeap'
+| 'youthEmploymentIncentive'
+| 'youthDigital'
+| 'seniorInternship'
+| 'newMiddleAgedJobs'
+
+export interface UserEtcDtoType {
+  benefits: Record<BenefitKey, string>
+  incomeTaxReduction: {
+    beginDate: string
+    endDate: string
+    employedType: string
+    militaryPeriod: string
+  }
+  registeredAt: string
+  lastLoginAt: string
+}
+
+// export type MemberLookupResponseDtoType = {
+//   memberId: number
+//   email: string
+//   name: string
+// }
+
+// // 직원관리 필터
+// export interface MemberFilterType {
+//   companyName: string
+//   officeDepartmentName: string
+//   officePosition: string
+//   memberStatus: string
+//   careerYear: string
+//   contractType: string
+//   laborForm: string
+//   workForm: string
+//   gender: genderType
+//   foreignYn: string
+//   birthMonth: string
+// }
+
+
+// ---------------------------------------------
 
 // GET api/members/[memberId]
 export type MemberDetailResponseDtoType = {
@@ -247,16 +399,16 @@ export type MemberLookupResponseDtoType = {
 
 // 직원관리 필터
 export interface MemberFilterType {
-  companyName: string
-  officeDepartmentName: string
-  officePosition: string
-  memberStatus: string
+  licenseName: string
+  department: string
+  position: string
+  status: string
   careerYear: string
   contractType: string
   laborForm: string
   workForm: string
   gender: genderType
-  foreignYn: string
+  nationality: string
   birthMonth: string
 }
 
@@ -1577,6 +1729,7 @@ export type matchResultType = 'MATCH' | 'MISMATCH' | 'NONE'
 export type inspectionResultType = 'PASS' | 'FAIL' | 'NONE'
 
 export type planYearType = 'INSPECTION' | 'REPLACEMENT' | 'REPAIR' | 'INSTALLATION' | 'NONE'
+
 export type resultType = 'PASS' | 'FAIL' | 'NONE'
 
 export type machineProjectPicTypeType = 'OVERVIEW' | 'LOCATION_MAP' | 'ETC'
@@ -1622,6 +1775,8 @@ export type engineerTypeType = 'MACHINE' | 'SAFETY'
 export type gradeType = 'ASSIST' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 export type memberStatusType = 'NORMAL' | 'QUIT' | 'PENDING' | 'LEAVE'
+// php
+export type userStatusType = 'NORMAL' | 'QUIT' | 'PENDING' | 'LEAVE'
 
 export type reportStatusType = 'PENDING' | 'COMPLETED' | 'FAILED'
 

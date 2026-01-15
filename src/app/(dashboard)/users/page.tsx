@@ -30,7 +30,7 @@ import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import AddUserModal from './_components/AddUserModall'
-import { useGetSingleMember, useGetUsers } from '@core/hooks/customTanstackQueries'
+import { useGetSingleUser, useGetUsers } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import { printErrorSnackbar } from '@core/utils/snackbarHandler'
@@ -42,7 +42,7 @@ import { isTabletContext } from '@/@core/contexts/mediaQueryContext'
 export default function UsersPage() {
   const searchParams = useSearchParams()
 
-  const curUserId = useCurrentUserStore(set => set.currentUser)?.memberId
+  const curUserId = useCurrentUserStore(set => set.currentUser)?.userId
 
   const isTablet = useContext(isTabletContext)
 
@@ -64,13 +64,13 @@ export default function UsersPage() {
   // 모달 관련 상태
   const [addUserModalOpen, setAddUserModalOpen] = useState(false)
   const [userDetailModalOpen, setUserDetailModalOpen] = useState(false)
-  const [memberId, setMemberId] = useState(0)
+  const [userId, setUserId] = useState(0)
 
-  const { data: selectedUser } = useGetSingleMember(memberId.toString())
-
+  const { data: selectedUser } = useGetSingleUser(userId.toString())
+  
   // 선택삭제 기능 관련
   const [showCheckBox, setShowCheckBox] = useState(false)
-  const [checked, setChecked] = useState<{ memberId: number }[]>([])
+  const [checked, setChecked] = useState<{ userId: number }[]>([])
 
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅해주는 함수
   const updateParams = useUpdateParams()
@@ -121,7 +121,7 @@ export default function UsersPage() {
   // 사용자 선택 핸들러 (디테일 모달)
   const handleUserClick = async (user: UserDtoType) => {
     try {
-      setMemberId(user.userSeq)
+      setUserId(user.userSeq)
       setUserDetailModalOpen(true)
     } catch (error) {
       handleApiError(error)
@@ -130,7 +130,7 @@ export default function UsersPage() {
 
   // 사용자 체크 핸들러 (다중선택)
   const handleCheckUser = (user: UserDtoType) => {
-    const obj = { memberId: user.userSeq }
+    const obj = { userId: user.userSeq }
     const checked = isChecked(user)
 
     if (user.userSeq === curUserId) {
@@ -142,7 +142,7 @@ export default function UsersPage() {
     if (!checked) {
       setChecked(prev => prev.concat(obj))
     } else {
-      setChecked(prev => prev.filter(v => v.memberId !== user.userSeq))
+      setChecked(prev => prev.filter(v => v.userId !== user.userSeq))
     }
   }
 
@@ -152,8 +152,8 @@ export default function UsersPage() {
         const newPrev = structuredClone(prev)
 
         data.forEach(user => {
-          if (!prev.find(v => v.memberId === user.userSeq) && user.userSeq !== curUserId) {
-            newPrev.push({ memberId: user.userSeq })
+          if (!prev.find(v => v.userId === user.userSeq) && user.userSeq !== curUserId) {
+            newPrev.push({ userId: user.userSeq })
           }
         })
 
@@ -165,7 +165,7 @@ export default function UsersPage() {
   }
 
   const isChecked = (user: UserDtoType) => {    
-    return checked.some(v => v.memberId === user.userSeq)
+    return checked.some(v => v.userId === user.userSeq)
   }
 
   // 여러 유저 한번에 삭제
@@ -193,7 +193,7 @@ export default function UsersPage() {
       try {
         await auth.delete(`/api/web/audit/users/${user.userSeq}`, {
           //@ts-ignore
-          data: { memberId: user.userSeq }
+          data: { userId: user.userSeq }
         })
 
         adjustPage(-1)
@@ -329,7 +329,7 @@ export default function UsersPage() {
             handleCheckAllItems={handleCheckAllUsers}
             rightClickMenuHeader={contextMenu => contextMenu.row.name}
             rightClickMenu={[
-              { icon: <IconTrashFilled color='gray' size={20} />, label: '삭제', handleClick: handleDeleteUser }
+            { icon: <IconTrashFilled color='gray' size={20} />, label: '삭제', handleClick: handleDeleteUser }
             ]}
           />
         </div>

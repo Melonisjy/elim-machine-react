@@ -1,7 +1,7 @@
 import { useGetLicenseNames } from './customTanstackQueries'
 
-export default function useCompanyNameOption() {
+export default function useLicenseNameOption() {
   const { data } = useGetLicenseNames()
 
-  return data?.map(v => ({ label: v.companyName, value: v.companyName }))
+  return data?.map(v => ({ label: v.licenseName, value: v.licenseName }))
 }
