@@ -30,7 +30,7 @@ import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import AddUserModal from './_components/AddUserModall'
-import { useGetSingleMember, useGetUsers } from '@core/hooks/customTanstackQueries'
+import { useGetSingleUser, useGetUsers } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import { printErrorSnackbar } from '@core/utils/snackbarHandler'
@@ -66,7 +66,7 @@ export default function UsersPage() {
   const [userDetailModalOpen, setUserDetailModalOpen] = useState(false)
   const [userId, setUserId] = useState(0)
 
-  const { data: selectedUser } = useGetSingleMember(userId.toString())
+  const { data: selectedUser } = useGetSingleUser(userId.toString())
   
   // 선택삭제 기능 관련
   const [showCheckBox, setShowCheckBox] = useState(false)
@@ -329,7 +329,7 @@ export default function UsersPage() {
             handleCheckAllItems={handleCheckAllUsers}
             rightClickMenuHeader={contextMenu => contextMenu.row.name}
             rightClickMenu={[
-              { icon: <IconTrashFilled color='gray' size={20} />, label: '삭제', handleClick: handleDeleteUser }
+            { icon: <IconTrashFilled color='gray' size={20} />, label: '삭제', handleClick: handleDeleteUser }
             ]}
           />
         </div>

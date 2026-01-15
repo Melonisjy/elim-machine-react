@@ -1,52 +1,53 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useContext, useImperativeHandle } from 'react'
 
 import { DialogContent, Grid2 } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
 
-import type { MemberPrivacyDtoType } from '@core/types'
+import type { UserPrivacyDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
 import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
-import { useSavedTabsContext, type refType } from '../UserModal'
+import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
 
 interface PrivacyTabContentProps {
-  defaultData: MemberPrivacyDtoType
+  defaultData: UserPrivacyDtoType
 }
 
 const PrivacyTabContent = forwardRef<refType, PrivacyTabContentProps>(({ defaultData }, ref) => {
-  const { mutateAsync: mutatePrivacyAsync } = useMutateSingleMember<MemberPrivacyDtoType>(
-    defaultData.memberId.toString(),
+  const userId = useContext(UserIdContext)
+  const { mutateAsync: mutatePrivacyAsync } = useMutateSingleMember<UserPrivacyDtoType>(
+    userId.toString(),
     'privacy'
   )
 
   const savedTabs = useSavedTabsContext()
 
-  const form = useForm<MemberPrivacyDtoType>({
+  const form = useForm<UserPrivacyDtoType>({
     defaultValues: {
       ...defaultData,
-      foreignYn: defaultData.foreignYn ?? '',
+      nationality: defaultData.nationality ?? '',
       juminNum: defaultData.juminNum ?? '',
       birthday: defaultData.birthday ?? '',
       phoneNumber: defaultData.phoneNumber ?? '',
-      emerNum1: defaultData.emerNum1 ?? '',
-      emerNum2: defaultData.emerNum2 ?? '',
+      emergency1: defaultData.emergency1 ?? '',
+      emergency2: defaultData.emergency2 ?? '',
       familyCnt: defaultData.familyCnt ?? 0,
       religion: defaultData.religion ?? '',
-      roadAddress: defaultData.roadAddress ?? '',
-      detailAddress: defaultData.detailAddress ?? '',
+      address: defaultData.address ?? '',
+      // detailAddress: defaultData.detailAddress ?? '',
       educationLevel: defaultData.educationLevel ?? '',
       educationMajor: defaultData.educationMajor ?? '',
-      carYn: defaultData.carYn ?? '',
+      carOwned: defaultData.carOwned ?? '',
       carNumber: defaultData.carNumber ?? '',
       bankName: defaultData.bankName ?? '',
       bankNumber: defaultData.bankNumber ?? ''
     }
   })
 
-  const watchCarYn = form.watch('carYn')
+  const watchCarOwned = form.watch('carOwned')
 
   function dontSave() {
     form.reset()
@@ -58,19 +59,19 @@ const PrivacyTabContent = forwardRef<refType, PrivacyTabContentProps>(({ default
 
       form.reset({
         ...newPrivacy,
-        foreignYn: newPrivacy.foreignYn ?? '',
+        nationality: newPrivacy.nationality ?? '',
         juminNum: newPrivacy.juminNum ?? '',
         birthday: newPrivacy.birthday ?? '',
         phoneNumber: newPrivacy.phoneNumber ?? '',
-        emerNum1: newPrivacy.emerNum1 ?? '',
-        emerNum2: newPrivacy.emerNum2 ?? '',
+        emergency1: newPrivacy.emergency1 ?? '',
+        emergency2: newPrivacy.emergency2 ?? '',
         familyCnt: newPrivacy.familyCnt ?? 0,
         religion: newPrivacy.religion ?? '',
-        roadAddress: newPrivacy.roadAddress ?? '',
-        detailAddress: newPrivacy.detailAddress ?? '',
+        address: newPrivacy.address ?? '',
+        // detailAddress: newPrivacy.detailAddress ?? '',
         educationLevel: newPrivacy.educationLevel ?? '',
         educationMajor: newPrivacy.educationMajor ?? '',
-        carYn: newPrivacy.carYn ?? '',
+        carOwned: newPrivacy.carOwned ?? '',
         carNumber: newPrivacy.carNumber ?? '',
         bankName: newPrivacy.bankName ?? '',
         bankNumber: newPrivacy.bankNumber ?? ''
@@ -93,24 +94,24 @@ const PrivacyTabContent = forwardRef<refType, PrivacyTabContentProps>(({ default
   return (
     <DialogContent className='overflow-visible pbs-0 sm:pli-16'>
       <Grid2 container spacing={3} columns={2} columnSpacing={5}>
-        <MultiInputBox name='foreignYn' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
+        <MultiInputBox name='nationality' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox name='juminNum' juminNum labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox type='date' name='birthday' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox name='phoneNumber' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
-        <TextInputBox name='emerNum1' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
-        <TextInputBox name='emerNum2' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
+        <TextInputBox name='emergency1' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
+        <TextInputBox name='emergency2' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox type='number' name='familyCnt' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox name='religion' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
 
-        <TextInputBox name='roadAddress' postcode labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={2} />
-        <TextInputBox name='detailAddress' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={2} />
+        <TextInputBox name='address' postcode labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={2} />
+        {/* <TextInputBox name='detailAddress' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={2} /> */}
 
         <TextInputBox name='educationLevel' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox name='educationMajor' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
 
-        <MultiInputBox name='carYn' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
+        <MultiInputBox name='carOwned' labelMap={MEMBER_INPUT_INFO.privacy} form={form} column={1} />
         <TextInputBox
-          disabled={watchCarYn !== 'Y'}
+          disabled={watchCarOwned !== 'Y'}
           name='carNumber'
           labelMap={MEMBER_INPUT_INFO.privacy}
           form={form}

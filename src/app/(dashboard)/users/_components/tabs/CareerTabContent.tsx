@@ -1,38 +1,40 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useContext, useImperativeHandle } from 'react'
 
 import { DialogContent, Grid2 } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
 
-import type { MemberCareerDtoType } from '@core/types'
+import type { UserCareerDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
 import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
-import { useSavedTabsContext, type refType } from '../UserModal'
+import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
 
 interface CareerTabContentProps {
-  defaultData: MemberCareerDtoType
+  defaultData: UserCareerDtoType
 }
 
 const CareerTabContent = forwardRef<refType, CareerTabContentProps>(({ defaultData }, ref) => {
-  const memberId = defaultData.memberId
+  const userId = useContext(UserIdContext)
 
   const savedTabs = useSavedTabsContext()
 
-  const { mutateAsync: mutateCareerAsync } = useMutateSingleMember<MemberCareerDtoType>(memberId.toString(), 'career')
+  const { mutateAsync: mutateCareerAsync } = useMutateSingleMember<UserCareerDtoType>(userId.toString(), 'career')
 
-  const form = useForm<MemberCareerDtoType>({
+  const form = useForm<UserCareerDtoType>({
     defaultValues: {
       ...defaultData,
 
-      grade: defaultData.grade ?? '',
+      jobGrade: defaultData.jobGrade ?? '',
       jobField: defaultData.jobField ?? '',
-      industrySameMonth: defaultData.industrySameMonth ?? 0,
-      industryOtherMonth: defaultData.industryOtherMonth ?? 0,
-      licenseName1: defaultData.licenseName1 ?? '',
-      licenseName2: defaultData.licenseName2 ?? ''
+      preJoinExperienceMonth: {
+        industrySameMonth: defaultData.preJoinExperienceMonth?.industrySameMonth ?? 0,
+        industryOtherMonth: defaultData.preJoinExperienceMonth?.industryOtherMonth ?? 0
+      },
+      certNum1: defaultData.certNum1 ?? '',
+      certNum2: defaultData.certNum2 ?? ''
     }
   })
 
@@ -46,13 +48,14 @@ const CareerTabContent = forwardRef<refType, CareerTabContentProps>(({ defaultDa
 
       form.reset({
         ...newCareer,
-
-        grade: newCareer.grade ?? '',
+        jobGrade: newCareer.jobGrade ?? '',
         jobField: newCareer.jobField ?? '',
-        industrySameMonth: newCareer.industrySameMonth ?? 0,
-        industryOtherMonth: newCareer.industryOtherMonth ?? 0,
-        licenseName1: newCareer.licenseName1 ?? '',
-        licenseName2: newCareer.licenseName2 ?? ''
+        preJoinExperienceMonth: {
+          industrySameMonth: newCareer.preJoinExperienceMonth?.industrySameMonth ?? 0,
+          industryOtherMonth: newCareer.preJoinExperienceMonth?.industryOtherMonth ?? 0
+        },
+        certNum1: newCareer.certNum1 ?? '',
+        certNum2: newCareer.certNum2 ?? ''
       })
 
       console.log('career 정보 수정 완료')
@@ -68,28 +71,23 @@ const CareerTabContent = forwardRef<refType, CareerTabContentProps>(({ defaultDa
     handleDontSave: dontSave,
     dirty: form.formState.isDirty
   }))
+  
+  const { preJoinExperienceMonth, ...careerInfo } = MEMBER_INPUT_INFO.career
+  const labelMap = {
+    ...careerInfo,
+    'preJoinExperienceMonth.industrySameMonth': preJoinExperienceMonth?.industrySameMonth,
+    'preJoinExperienceMonth.industryOtherMonth': preJoinExperienceMonth?.industryOtherMonth
+  }
 
   return (
     <DialogContent className='overflow-visible pbs-0 sm:pli-16'>
       <Grid2 container spacing={3} columns={2} columnSpacing={5}>
-        <MultiInputBox disabled name='grade' form={form} labelMap={MEMBER_INPUT_INFO.career} column={1} />
-        <TextInputBox name='jobField' form={form} labelMap={MEMBER_INPUT_INFO.career} column={1} />
-        <TextInputBox
-          type='number'
-          name='industrySameMonth'
-          form={form}
-          labelMap={MEMBER_INPUT_INFO.career}
-          column={1}
-        />
-        <TextInputBox
-          type='number'
-          name='industryOtherMonth'
-          form={form}
-          labelMap={MEMBER_INPUT_INFO.career}
-          column={1}
-        />
-        <TextInputBox name='licenseName1' form={form} labelMap={MEMBER_INPUT_INFO.career} column={1} />
-        <TextInputBox name='licenseName2' form={form} labelMap={MEMBER_INPUT_INFO.career} column={1} />
+        <MultiInputBox disabled name='jobGrade' form={form} labelMap={labelMap} column={1} />
+        <TextInputBox name='jobField' form={form} labelMap={labelMap} column={1} />
+        <TextInputBox type='number' name='preJoinExperienceMonth.industrySameMonth' form={form} labelMap={labelMap} column={1} />
+        <TextInputBox type='number' name='preJoinExperienceMonth.industryOtherMonth' form={form} labelMap={labelMap} column={1} />
+        <TextInputBox name='certNum1' form={form} labelMap={labelMap} column={1} />
+        <TextInputBox name='certNum2' form={form} labelMap={labelMap} column={1} />
       </Grid2>
     </DialogContent>
   )

@@ -76,7 +76,8 @@ import type {
   successResponseDtoType,
   targetType,
   WindMeasurementResponseDtoType,
-  UserResponseDtoType
+  UserResponseDtoType,
+  UserDetailResponseDtoType
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -89,7 +90,7 @@ export const useGetLicenseNames = () => {
 
       const response = await auth
         .get<{
-          data: { licenseIdAndNameResponseDtos: { id: number; companyName: string }[] }
+          data: { licenseIdAndNameResponseDtos: { id: number; licenseName: string }[] }
         }>(`/api/licenses/names`)
         .then(v => v.data.data.licenseIdAndNameResponseDtos)
 
@@ -1564,6 +1565,8 @@ export const useMutateSingleMemberBasic = (memberId: string) => {
 }
 
 export type MemberType = 'basic' | 'privacy' | 'office' | 'career' | 'etc'
+// php
+export type UserType = 'basic' | 'privacy' | 'office' | 'career' | 'etc'
 
 const memberRequestInfo: Record<MemberType, { url: string; dtoKey: keyof MemberDetailResponseDtoType }> = {
   basic: { url: '', dtoKey: 'memberBasicResponseDto' },
@@ -2314,6 +2317,44 @@ const createPhpApiQueryHook = <T>(
   }
 }
 
+const createDetailQueryHook = <T>(
+  buildEndpoint: (id: string) => string,
+  buildQueryKey: (id: string) => string[],
+  errorMessage: string
+) => {
+  return (id: string) => {
+    const fetchData: QueryFunction<T, string[]> = useCallback(
+      async data => {
+        const [keyType] = data.queryKey
+
+        const response = await phpAuth
+          .get<PhpApiResult<T>>(buildEndpoint(id))
+          .then(v => {
+            if (v.data.success && v.data.data) {
+              return v.data.data
+            }
+            throw new Error(v.data.message || errorMessage)
+          })
+          .catch(e => {
+            throw new Error(errorMessage || e.message)
+          })
+
+        console.log(`!!! queryFn ${keyType}:`)
+
+        return response
+      },
+      [id]
+    )
+
+    return useQuery({
+      queryKey: buildQueryKey(id),
+      queryFn: fetchData,
+      enabled: Number(id) > 0,
+      staleTime: 1000 * 60 * 5
+    })
+  }
+}
+
 // GET /api/web/audit/login-logs
 export const useGetLoginLogs = createPhpApiQueryHook<LoginLogPageResponseDtoType>(
   '/api/web/audit/login-logs',
@@ -2327,4 +2368,11 @@ export const useGetUsers = createPhpApiQueryHook<UserResponseDtoType>(
   '/api/web/audit/users',
   QUERY_KEYS.USER.GET_USERS,
   '직원 조회 실패'
+)
+
+// GET /api/web/users/{userId}
+export const useGetSingleUser = createDetailQueryHook<UserDetailResponseDtoType>(
+  userId => `/api/web/users/${userId}`,
+  QUERY_KEYS.USER.GET_SINGLE_USER,
+  '직원 상세 조회 실패'
 )

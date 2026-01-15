@@ -1,41 +1,41 @@
-import { forwardRef, useImperativeHandle } from 'react'
+import { forwardRef, useContext, useImperativeHandle } from 'react'
 
 import { DialogContent, Grid2 } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
 
-import type { MemberBasicDtoType } from '@core/types'
+import type { UserBasicDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
 import { useGetLicenseNames, useMutateSingleMember } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
-import { useSavedTabsContext, type refType } from '../UserModal'
+import { useSavedTabsContext, UserIdContext, type refType } from '../UserModal'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
 
 interface BasicTabContentProps {
-  defaultData: MemberBasicDtoType
+  defaultData: UserBasicDtoType
 }
 
 const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData }, ref) => {
-  const memberId = defaultData.memberId
+  const userId = useContext(UserIdContext)
 
   const savedTabs = useSavedTabsContext()
 
   const { currentUser, setCurrentUserName } = useCurrentUserStore()
 
-  const { mutateAsync: mutateBasicAsync } = useMutateSingleMember<MemberBasicDtoType>(memberId.toString(), 'basic')
+  const { mutateAsync: mutateBasicAsync } = useMutateSingleMember<UserBasicDtoType>(userId.toString(), 'basic')
   const { data: licenseNames } = useGetLicenseNames()
-  const companyNameOption = licenseNames?.map(v => ({ value: v.companyName, label: v.companyName }))
+  const licenseNameOption = licenseNames?.map(v => ({ value: v.licenseName, label: v.licenseName }))
 
-  const form = useForm<MemberBasicDtoType>({
+  const form = useForm<UserBasicDtoType>({
     defaultValues: {
       ...defaultData,
       name: defaultData.name ?? '',
       email: defaultData.email ?? '',
-      companyName: defaultData.companyName ?? '',
-      memberStatus: defaultData.memberStatus ?? '',
-      note: defaultData.note ?? ''
+      licenseName: defaultData.licenseName ?? '',
+      status: defaultData.status ?? '',
+      remark: defaultData.remark ?? ''
     }
   })
 
@@ -51,13 +51,13 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
         ...newBasic,
         name: newBasic.name ?? '',
         email: newBasic.email ?? '',
-        companyName: newBasic.companyName ?? '',
-        memberStatus: newBasic.memberStatus ?? '',
-        note: newBasic.note ?? ''
+        licenseName: newBasic.licenseName ?? '',
+        status: newBasic.status ?? '',
+        remark: newBasic.remark ?? ''
       })
 
       // 헤더에서 사용하는 정보 업데이트 (현재 로그인 중인 사용자의 정보라면)
-      if (currentUser && currentUser.memberId === newBasic.memberId) {
+      if (currentUser && currentUser.userId) {
         setCurrentUserName(newBasic.name)
       }
 
@@ -81,16 +81,16 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
         <TextInputBox name='name' form={form} labelMap={MEMBER_INPUT_INFO.basic} column={1} />
         <TextInputBox name='email' form={form} labelMap={MEMBER_INPUT_INFO.basic} column={1} />
         <MultiInputBox
-          name='companyName'
+          name='licenseName'
           form={form}
           labelMap={{
             ...MEMBER_INPUT_INFO.basic,
-            companyName: { ...MEMBER_INPUT_INFO.basic.companyName, options: companyNameOption }
+            licenseName: { ...MEMBER_INPUT_INFO.basic.licenseName, options: licenseNameOption }
           }}
           column={1}
         />
-        <MultiInputBox name='memberStatus' form={form} labelMap={MEMBER_INPUT_INFO.basic} column={1} />
-        <TextInputBox multiline name='note' form={form} labelMap={MEMBER_INPUT_INFO.basic} column={2} />
+        <MultiInputBox name='status' form={form} labelMap={MEMBER_INPUT_INFO.basic} column={1} />
+        <TextInputBox multiline name='remark' form={form} labelMap={MEMBER_INPUT_INFO.basic} column={2} />
       </Grid2>
     </DialogContent>
   )
