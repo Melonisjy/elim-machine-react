@@ -71,7 +71,7 @@ export async function login(email: string, password: string): Promise<number> {
 
       // 사용자 정보는 data에 직접 있음 (userSeq, email, name, roles, status)
       const UserInfo = {
-        memberId: responseData.userSeq,
+        userId: responseData.userSeq,
         name: responseData.name
       }
 
