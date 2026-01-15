@@ -2370,9 +2370,9 @@ export const useGetUsers = createPhpApiQueryHook<UserResponseDtoType>(
   '직원 조회 실패'
 )
 
-// GET /api/web/users/{userId}
+// GET /api/web/user/{userId}
 export const useGetSingleUser = createDetailQueryHook<UserDetailResponseDtoType>(
-  userId => `/api/web/users/${userId}`,
+  userId => `/api/web/user/${userId}`,
   QUERY_KEYS.USER.GET_SINGLE_USER,
   '직원 상세 조회 실패'
 )
