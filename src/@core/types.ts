@@ -410,6 +410,7 @@ export interface MemberFilterType {
   gender: genderType
   nationality: string
   birthMonth: string
+  region: string
 }
 
 // ----------- 기계설비현장 (Machine Project) -----------
