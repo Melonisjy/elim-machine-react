@@ -1,6 +1,6 @@
 import { MEMBER_INPUT_INFO } from '../input/memberInputInfo'
 import type { InputFieldType, MemberFilterType } from '../../types'
-import { birthMonthOption, careerYearOption, genderOption } from '@/@core/data/options'
+import { birthMonthOption, careerYearOption, genderOption, regionOption } from '@/@core/data/options'
 
 const { licenseName, status } = MEMBER_INPUT_INFO.basic
 const { position, department, contractType, laborForm, workForm } = MEMBER_INPUT_INFO.office
@@ -30,5 +30,10 @@ export const MEMBER_FILTER_INFO: Record<keyof MemberFilterType, InputFieldType> 
     type: 'multi',
     label: '생일',
     options: birthMonthOption
+  },
+  region: {
+    type: "multi",
+    label: '지역',
+    options: regionOption
   }
 }
