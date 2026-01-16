@@ -55,7 +55,6 @@ export default function UsersPage() {
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
   const name = searchParams.get('name')
-  const region = searchParams.get('region')
 
   const disabled = isLoading || isError
 
@@ -75,7 +74,7 @@ export default function UsersPage() {
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅해주는 함수
   const updateParams = useUpdateParams()
 
-  type paramType = 'page' | 'size' | 'name' | 'region'
+  type paramType = 'page' | 'size' | 'name'
 
   // 객체 형식으로 데이터를 전달받으면 그에 따라 searchParams를 설정하고 라우팅하는 함수
   const setQueryParams = useSetQueryParams<paramType>()
@@ -84,7 +83,6 @@ export default function UsersPage() {
     updateParams(params => {
       params.delete('page')
       params.delete('name')
-      params.delete('region')
       params.delete('sort')
 
       const filterKeys = Object.keys(MEMBER_FILTER_INFO)
@@ -263,18 +261,6 @@ export default function UsersPage() {
               }}
               disabled={disabled}
             />
-            {/* 지역으로 검색 */}
-            {!isTablet && (
-              <SearchBar
-                key={`region${region}`}
-                defaultValue={region ?? ''}
-                placeholder='지역으로 검색'
-                setSearchKeyword={region => {
-                  setQueryParams({ region: region, page: 0 })
-                }}
-                disabled={disabled}
-              />
-            )}
           </div>
 
           <div className='flex sm:flex-row max-sm:is-full items-start sm:items-center gap-2 sm:gap-4'>
