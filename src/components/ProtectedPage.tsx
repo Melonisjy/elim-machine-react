@@ -13,14 +13,19 @@ export default function ProtectedPage({ children }: { children: React.ReactNode 
 
   const [dotCnt, setDotCnt] = useState<0 | 1 | 2 | 3>(0)
   const [showRelogin, setShowRelogin] = useState(false)
+  const [hostname, setHostname] = useState<string | null>(null)
 
   const accessToken = useAccessTokenStore(set => set.accessToken)
+
+  // 환경 변수로 인증 보호 비활성화 제어
+  const skipProtection = process.env.NEXT_PUBLIC_SKIP_AUTH === 'true' && hostname === "localhost"
 
   const routeToLoginPage = useCallback(() => {
     router.push('/login')
   }, [router])
 
   useEffect(() => {
+    setHostname(window.location.hostname)
     const intervalId = setInterval(() => setDotCnt(prev => (prev === 3 ? 0 : ((prev + 1) as 1 | 2 | 3))), 500)
 
     setTimeout(() => {
@@ -29,6 +34,11 @@ export default function ProtectedPage({ children }: { children: React.ReactNode 
 
     return () => clearInterval(intervalId)
   }, [])
+
+  // 개발 환경이거나 환경 변수로 비활성화된 경우 바로 접근 허용
+  if (skipProtection) {
+    return <>{children}</>
+  }
 
   return (
     <>
