@@ -41,11 +41,11 @@ export default function Licensepage() {
 
   const { data: licensesPages, refetch: refetchPages, isLoading, isError } = useGetLicenses(searchParams.toString())
 
-  const data = licensesPages?.content ?? []
+  const data = licensesPages?.items ?? []
 
   const disabled = isLoading || isError
 
-  const totalCount = licensesPages?.page.totalElements ?? 0
+  const totalCount = licensesPages?.total ?? 0
 
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
@@ -61,7 +61,7 @@ export default function Licensepage() {
 
   // 선택삭제 기능 관련
   const [showCheckBox, setShowCheckBox] = useState(false)
-  const [checked, setChecked] = useState<{ licenseId: number; version: number }[]>([])
+  const [checked, setChecked] = useState<{ licenseSeq: number }[]>([])
 
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅까지 해주는 함수
   const updateParams = useUpdateParams()
@@ -82,8 +82,8 @@ export default function Licensepage() {
   // 라이선스 선택 핸들러
   const handleLicenseClick = async (licenseData: LicensePageResponseDtoType) => {
     try {
-      setSelectedId(licenseData.licenseId)
-      setOpenDetail(true)
+      setSelectedId(licenseData.licenseSeq)
+      // setOpenDetail(true)
     } catch (error) {
       handleApiError(error, '라이선스를 선택하는 데 실패했습니다.')
     }
@@ -91,26 +91,26 @@ export default function Licensepage() {
 
   // 설비인력 체크 핸들러 (다중선택)
   const handleCheckLicense = (license: LicensePageResponseDtoType) => {
-    const { licenseId, version } = license
+    const { licenseSeq } = license
     const checked = isChecked(license)
 
     if (!checked) {
-      setChecked(prev => prev.concat({ licenseId: licenseId, version: version }))
+      setChecked(prev => prev.concat({ licenseSeq: licenseSeq }))
     } else {
-      setChecked(prev => prev.filter(v => v.licenseId !== licenseId))
+      setChecked(prev => prev.filter(v => v.licenseSeq !== licenseSeq))
     }
   }
 
   const handleCheckAllLicenses = (checked: boolean) => {
     if (checked) {
-      setChecked(data.map(v => ({ licenseId: v.licenseId, version: v.version })))
+      setChecked(data.map(v => ({ licenseSeq: v.licenseSeq })))
     } else {
       setChecked([])
     }
   }
 
   const isChecked = (license: LicensePageResponseDtoType) => {
-    return checked.some(v => v.licenseId === license.licenseId)
+    return checked.some(v => v.licenseSeq === license.licenseSeq)
   }
 
   // offset만큼 요소수가 변화했을 때 valid한 페이지 param을 책임지는 함수
@@ -285,13 +285,13 @@ export default function Licensepage() {
             isChecked={isChecked}
             handleCheckItem={handleCheckLicense}
             handleCheckAllItems={handleCheckAllLicenses}
-            rightClickMenuHeader={contextMenu => contextMenu.row.companyName}
+            rightClickMenuHeader={contextMenu => contextMenu.row.name}
             rightClickMenu={[
               {
                 icon: <IconTrashFilled color='gray' size={20} />,
                 label: '삭제',
                 handleClick: async row => {
-                  await deleteLicense(row.licenseId, row.version)
+                  await deleteLicense(row.licenseSeq)
                   adjustPage(-1)
                   removeQueryCaches()
                 }

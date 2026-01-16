@@ -69,7 +69,7 @@ const LicenseModal = ({ open, setOpen, initialData, adjustPage, reloadPages }: L
   const isDirty = form.formState.isDirty
 
   const handleDeleteLicense = async () => {
-    await deleteLicense(licenseId, initialData.version)
+    await deleteLicense(licenseId)
     adjustPage(-1)
     reloadPages()
     setOpen(false)
@@ -80,7 +80,7 @@ const LicenseModal = ({ open, setOpen, initialData, adjustPage, reloadPages }: L
       setLoading(true)
 
       try {
-        mutateLicense({ ...data, version: initialData.version } as LicenseResponseDtoType)
+        mutateLicense(data as LicenseResponseDtoType)
 
         form.reset(data)
         handleSuccess(`라이선스 정보가 수정되었습니다.`)
