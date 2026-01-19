@@ -14,8 +14,10 @@ import classNames from 'classnames'
 import type { TableCellProps } from '@mui/material'
 import { Checkbox, Divider, ListItemIcon, Menu, MenuItem, styled, TableCell, Typography } from '@mui/material'
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
+import ExpandLessOutlinedIcon from '@mui/icons-material/ExpandLessOutlined';
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 
-import { IconCaretDownFilled, IconCaretUpFilled, IconExclamationCircleFilled } from '@tabler/icons-react'
+import { IconExclamationCircleFilled } from '@tabler/icons-react'
 
 import type { HeaderType } from '@core/types'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
@@ -87,6 +89,9 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
   const sort = searchParams.get('sort')?.split(',')
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
+
+  console.log(searchParams.toString());
+  
 
   const currentUserId = useCurrentUserStore(set => set.currentUser)?.userId
 
@@ -191,9 +196,9 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     {header[k]?.canSort &&
                       (sort && sort[0] === k ? (
                         sort[1] === 'desc' ? (
-                          <IconCaretDownFilled color='gray' size={18} />
+                          <ExpandLessOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
                         ) : (
-                          <IconCaretUpFilled color='gray' size={18} />
+                          <ExpandMoreOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
                         )
                       ) : (
                         <UnfoldMoreIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
