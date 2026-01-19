@@ -15,7 +15,7 @@ import { IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
 
 import { useQueryClient } from '@tanstack/react-query'
 
-import { Alert, Typography } from '@mui/material'
+import { Alert, Typography, Chip, Box } from '@mui/material'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -180,6 +180,95 @@ export default function UsersPage() {
     })
   }, [updateParams])
 
+  // 활성화된 필터들을 추출하는 함수
+  const getActiveFilters = useCallback(() => {
+    const params = new URLSearchParams(searchParams)
+    const activeFilters: Array<{ key: string; label: string; value: string; displayValue: string }> = []
+
+    Object.keys(MEMBER_FILTER_INFO).forEach(filterKey => {
+      const filterValue = params.get(filterKey)
+      if (filterValue && filterValue !== '') {
+        const filterInfo = MEMBER_FILTER_INFO[filterKey as keyof MemberFilterType]
+        const filterLabel = filterInfo.label
+
+        // multi 타입인 경우 여러 값을 처리
+        if (filterInfo.type === 'multi') {
+          const values = filterValue.split(',')
+          values.forEach(value => {
+            const option = filterInfo.options?.find(opt => opt.value === value)
+            const displayValue = option ? option.label : value
+            activeFilters.push({
+              key: filterKey,
+              label: filterLabel,
+              value: value,
+              displayValue: displayValue
+            })
+          })
+        } else {
+          // single 타입인 경우
+          const option = filterInfo.options?.find(opt => opt.value === filterValue)
+          const displayValue = option ? option.label : filterValue
+          activeFilters.push({
+            key: filterKey,
+            label: filterLabel,
+            value: filterValue,
+            displayValue: displayValue
+          })
+        }
+      }
+    })
+
+    // 이름 검색도 필터로 표시
+    const nameValue = params.get('name')
+    if (nameValue && nameValue !== '') {
+      activeFilters.push({
+        key: 'name',
+        label: '이름',
+        value: nameValue,
+        displayValue: nameValue
+      })
+    }
+
+    return activeFilters
+  }, [searchParams])
+
+  // 특정 필터 제거 함수
+  const removeFilter = useCallback(
+    (filterKey: string, filterValue: string) => {
+      updateParams(params => {
+        const currentValue = params.get(filterKey)
+
+        if (!currentValue) return
+
+        // name 필터는 MEMBER_FILTER_INFO에 없으므로 바로 제거
+        if (filterKey === 'name') {
+          params.delete(filterKey)
+          params.delete('page')
+          return
+        }
+
+        const filterInfo = MEMBER_FILTER_INFO[filterKey as keyof MemberFilterType]
+
+        // multi 타입인 경우 콤마로 구분된 값에서 제거
+        if (filterInfo?.type === 'multi') {
+          const values = currentValue.split(',').filter(v => v !== filterValue)
+          if (values.length > 0) {
+            params.set(filterKey, values.join(','))
+          } else {
+            params.delete(filterKey)
+          }
+        } else {
+          // single 타입인 경우 전체 제거
+          params.delete(filterKey)
+        }
+
+        // 필터 변경 시 페이지를 0으로 리셋
+        params.delete('page')
+      })
+    },
+    [updateParams]
+  )
+
   // offset만큼 요소수가 변화했을 때 valid한 페이지 param을 책임지는 함수
   const adjustPage = useCallback(
     (offset = 0) => {
@@ -300,18 +389,30 @@ export default function UsersPage() {
         <CardHeader slotProps={{ title: { typography: 'h4' } }} title={`직원관리 (${totalCount})`} className='pbe-4' />
         {/* 필터바 */}
         {!isTablet && <BasicTableFilter<MemberFilterType> filterInfo={MEMBER_FILTER_INFO} disabled={disabled} />}
-        {/* 필터 초기화 버튼 */}
-        {!isTablet && (
-          <Button
-            startIcon={<IconReload />}
-            onClick={() => {
-              resetQueryParams()
-            }}
-            className='max-sm:is-full absolute right-8 top-8'
-            disabled={disabled}
-          >
-            필터 초기화
-          </Button>
+        {/* 활성화된 필터 Chip 표시 */}
+        {!isTablet && getActiveFilters().length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 6, pb: 2 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {getActiveFilters().map((filter, index) => (
+                <Chip
+                  key={`${filter.key}-${filter.value}-${index}`}
+                  label={`${filter.label}: ${filter.displayValue}`}
+                  onDelete={() => removeFilter(filter.key, filter.value)}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                />
+              ))}
+            </Box>
+            <Button
+              startIcon={<IconReload />}
+              onClick={resetQueryParams}
+              size="small"
+              disabled={disabled}
+            >
+              필터 초기화
+            </Button>
+          </Box>
         )}
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-3 sm:p-6 border-bs gap-2 sm:gap-4'>
           <div className='flex gap-2'>
