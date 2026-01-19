@@ -66,7 +66,7 @@ function InputBoxContent() {
 
   // 회사명 옵션
   const { data: licenseNames } = useGetLicenseNames()
-  const companyNameOption = licenseNames?.map(v => ({ value: v.companyName, label: v.companyName }))
+  const companyNameOption = licenseNames?.map(v => ({ value: v.licenseName, label: v.licenseName }))
 
   // 주민번호 핸들링
   const [juminNum, setJuminNum] = useState(value)

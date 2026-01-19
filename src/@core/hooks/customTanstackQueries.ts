@@ -54,7 +54,6 @@ import type {
   MemberOfficeDtoType,
   MemberPageDtoType,
   MemberPrivacyDtoType,
-  LoginLogPageResponseDtoType,
   PipeMeasurementResponseDtoType,
   SafetyProjectAttachmentCreateRequestDtoType,
   SafetyProjectAttachmentCreateResponseDtoType,
@@ -77,7 +76,9 @@ import type {
   targetType,
   WindMeasurementResponseDtoType,
   UserResponseDtoType,
-  UserDetailResponseDtoType
+  UserDetailResponseDtoType,
+  LoginLogDtoType,
+  PhpApiResponseDtoType
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -99,31 +100,6 @@ export const useGetLicenseNames = () => {
       return response
     },
     staleTime: 1000 * 60 * 5 // 5분
-  })
-}
-
-// GET /api/licenses
-export const useGetLicenses = (queryParams: string) => {
-  return useQuery({
-    queryKey: QUERY_KEYS.LICENSE.GET_LICENSES(queryParams),
-    queryFn: async data => {
-      const [keyType, queryParams] = data.queryKey
-      const params = new URLSearchParams(queryParams)
-
-      if (!params.has('size')) {
-        params.set('size', '15')
-      }
-
-      const response = await auth
-        .get<{
-          data: successResponseDtoType<LicensePageResponseDtoType[]>
-        }>(`/api/licenses?${params}`)
-        .then(v => v.data.data)
-
-      console.log(`!!! queryFn ${keyType} in ${params}:`)
-
-      return response
-    }
   })
 }
 
@@ -2281,7 +2257,7 @@ export const useMutateGuide = (machineProjectId: string) => {
 
 /* -------------------------------- PHP API -------------------------------- */
 
-const createPhpApiQueryHook = <T>(
+const createQueryHook = <T>(
   endpoint: string,
   queryKey: (queryParams: string) => string[],
   errorMessage: string
@@ -2356,7 +2332,7 @@ const createDetailQueryHook = <T>(
 }
 
 // GET /api/web/audit/login-logs
-export const useGetLoginLogs = createPhpApiQueryHook<LoginLogPageResponseDtoType>(
+export const useGetLoginLogs = createQueryHook<PhpApiResponseDtoType<LoginLogDtoType>>(
   '/api/web/audit/login-logs',
   QUERY_KEYS.LOGIN_LOG.GET_LOGIN_LOGS,
   '로그인 기록 조회 실패'
@@ -2364,7 +2340,7 @@ export const useGetLoginLogs = createPhpApiQueryHook<LoginLogPageResponseDtoType
 
 
 // GET /api/web/audit/users
-export const useGetUsers = createPhpApiQueryHook<UserResponseDtoType>(
+export const useGetUsers = createQueryHook<UserResponseDtoType>(
   '/api/web/audit/users',
   QUERY_KEYS.USER.GET_USERS,
   '직원 조회 실패'
@@ -2375,4 +2351,11 @@ export const useGetSingleUser = createDetailQueryHook<UserDetailResponseDtoType>
   userId => `/api/web/user/${userId}`,
   QUERY_KEYS.USER.GET_SINGLE_USER,
   '직원 상세 조회 실패'
+)
+
+// GET /api/web/audit/licenses
+export const useGetLicenses = createQueryHook<PhpApiResponseDtoType<LicensePageResponseDtoType>>(
+  `/api/web/audit/licenses`,
+  QUERY_KEYS.LICENSE.GET_LICENSES,
+  '라이선스 조회 실패'
 )

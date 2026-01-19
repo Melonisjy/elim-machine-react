@@ -1172,22 +1172,45 @@ export interface MachineProjectPicUpdateRequestDtoType {
 
 // ----------- 라이선스 -----------
 // api/licenses 라이선스 목록 조회 응답 DTO
+// export interface LicensePageResponseDtoType {
+//   licenseId: number
+//   version: number
+//   region: string
+//   bizno: string
+//   companyName: string
+//   ceoName: string
+//   memberCount: number
+//   machineEngineerCount: number
+//   safetyEngineerCount: number
+//   managerName: string
+//   managerEmail: string
+//   managerPhoneNumber: string
+//   tel: string
+//   contractDate: string
+//   expireDate: string
+// }
+
+// php
+// GET /api/web/audit/licenses
 export interface LicensePageResponseDtoType {
-  licenseId: number
-  version: number
+  num: number
+  licenseSeq: number
+  name: string
+  englishName: string
   region: string
   bizno: string
-  companyName: string
   ceoName: string
-  memberCount: number
-  machineEngineerCount: number
-  safetyEngineerCount: number
-  managerName: string
-  managerEmail: string
-  managerPhoneNumber: string
-  tel: string
   contractDate: string
   expireDate: string
+  userCnt: number
+  machineEngineerCnt: number
+  safetyEngineerCnt: number
+  machineProjectCnt: number
+  safetyProjectCnt: number
+  manager: string
+  email: string
+  phoneNumber: string
+  telNumber: string
 }
 
 // GET api/licenses/[licenseId] : 라이선스 단건 조회 응답 DTO
@@ -1698,8 +1721,8 @@ export interface LoginLogDtoType {
   success: 'Y' | 'N'
 }
 
-export interface LoginLogPageResponseDtoType {
-  items: LoginLogDtoType[]
+export interface PhpApiResponseDtoType<T> {
+  items: T[]
   total: number
   page: number
   size: number

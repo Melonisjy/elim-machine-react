@@ -42,7 +42,7 @@ import { isTabletContext } from '@/@core/contexts/mediaQueryContext'
 export default function MemberPage() {
   const searchParams = useSearchParams()
 
-  const curUserId = useCurrentUserStore(set => set.currentUser)?.memberId
+  const curUserId = useCurrentUserStore(set => set.currentUser)?.userId
 
   const isTablet = useContext(isTabletContext)
 
