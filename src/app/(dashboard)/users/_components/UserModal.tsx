@@ -2,7 +2,7 @@
 
 // React Imports
 import type { RefObject } from 'react'
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 // MUI Imports
 
@@ -21,12 +21,12 @@ import TabContext from '@mui/lab/TabContext'
 
 import { IconX } from '@tabler/icons-react'
 
-import type {  UserDetailResponseDtoType } from '@core/types'
+import type { UserDetailResponseDtoType } from '@core/types'
 
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import DeleteModal from '@/@core/components/elim-modal/DeleteModal'
 import { auth } from '@core/utils/auth'
-import type {  UserType } from '@core/hooks/customTanstackQueries'
+import type { UserType } from '@core/hooks/customTanstackQueries'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import AlertModal from '@/@core/components/elim-modal/AlertModal'
 import BasicTabContent from './tabs/BasicTabContent'
@@ -119,6 +119,8 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
   const [openForgetPW, setOpenForgotPW] = useState(false)
 
   const [loading, setLoading] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
+
 
   const basicTabRef = useRef<refType>(null)
   const privacyTabRef = useRef<refType>(null)
@@ -133,8 +135,23 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
       officeTabRef.current?.dirty ||
       careerTabRef.current?.dirty ||
       etcTabRef.current?.dirty
-    )
+    ) ?? false
   }, [])
+
+  useEffect(() => {
+    const checkDirty = () => {
+      const dirty = getIsDirty()
+      setIsDirty(dirty)
+    }
+
+    // 초기 확인
+    checkDirty()
+
+    // 주기적으로 확인 (폼 상태 변경 감지)
+    const interval = setInterval(checkDirty, 100)
+
+    return () => clearInterval(interval)
+  }, [getIsDirty])
 
   const userId = selectedUserData.userId
 
@@ -146,21 +163,21 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
 
   // else 문 추가 필요
   const handleDeleteUser = async () => {
-    if (userId !== undefined) {
-      try {
-        await auth.delete(`/api/members`, {
-          // @ts-ignore
-          data: { memberDeleteRequestDtos: [{ memberId: memberId, version: version }] }
-        })
+    if (!userId) return
 
-        console.log(`memberId: ${userId} user is deleted successfully`)
-        handleSuccess('해당 직원이 삭제되었습니다.')
-        onDelete && onDelete()
-        changedEvenOnce.current = true
-        onClose()
-      } catch (error) {
-        handleApiError(error)
-      }
+    try {
+      await auth.delete(`/api/members`, {
+        // @ts-ignore
+        data: { memberDeleteRequestDtos: [{ memberId: memberId, version: version }] }
+      })
+
+      console.log(`memberId: ${userId} user is deleted successfully`)
+      handleSuccess('해당 직원이 삭제되었습니다.')
+      onDelete && onDelete()
+      changedEvenOnce.current = true
+      onClose()
+    } catch (error) {
+      handleApiError(error)
     }
   }
 
@@ -259,7 +276,7 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
           <DialogTitle sx={{ position: 'relative' }}>
             <div className='flex flex-col w-full grid place-items-center'>
               <Typography variant='h3'>
-              {selectedUserData?.userBasicResponseDto?.name || '사용자 정보 수정'}
+                {selectedUserData?.userBasicResponseDto?.name || '사용자 정보 수정'}
               </Typography>
               <Typography variant='subtitle1'>{selectedUserData?.userBasicResponseDto?.licenseName || ''}</Typography>
             </div>
@@ -304,7 +321,7 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
             </TabContext>
           </DialogContent>
           <DialogActions sx={{ justifyContent: 'center', pb: 10 }}>
-            <Button variant='contained' onClick={onSubmitHandler} type='submit' color='success' disabled={loading}>
+            <Button variant='contained' onClick={onSubmitHandler} type='submit' color='success' disabled={loading || !isDirty}>
               저장
             </Button>
             <Button variant='contained' color='secondary' onClick={handleClose}>
