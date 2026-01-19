@@ -36,8 +36,7 @@ import OfficeTabContent from './tabs/OfficeTabContent'
 import CareerTabContent from './tabs/CareerTabContent'
 import EtcTabContent from './tabs/EtcTabContent'
 import ForgotPwModal from '@/app/(login)/login/_components/ForgotPwModal'
-import { printWarningSnackbar } from '@core/utils/snackbarHandler'
-import ResetButton from '@/@core/components/elim-button/ResetButton'
+
 
 export type refType = {
   handleSave: () => Promise<void>
@@ -260,43 +259,9 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
           <DialogTitle sx={{ position: 'relative' }}>
             <div className='flex flex-col w-full grid place-items-center'>
               <Typography variant='h3'>
-                {selectedUserData?.userBasicResponseDto?.name || '사용자 정보 수정'}
+              {selectedUserData?.userBasicResponseDto?.name || '사용자 정보 수정'}
               </Typography>
               <Typography variant='subtitle1'>{selectedUserData?.userBasicResponseDto?.licenseName || ''}</Typography>
-            </div>
-            <div className='absolute left-8 top-6'>
-              <div className='flex gap-3'>
-                {isYours ? (
-                  <Button
-                    variant='contained'
-                    color='warning'
-                    onClick={() => {
-                      setOpenForgotPW(true)
-                    }}
-                  >
-                    비밀번호 변경
-                  </Button>
-                ) : (
-                  <Button
-                    variant='contained'
-                    color='error'
-                    type='reset'
-                    onClick={() => {
-                      setOpenDelete(true)
-                    }}
-                  >
-                    삭제
-                  </Button>
-                )}
-                <ResetButton
-                  onClick={() => {
-                    const dirty = getIsDirty()
-
-                    if (dirty) setOpenAlertNoSave(true)
-                    else printWarningSnackbar('변경사항이 없습니다', 1500)
-                  }}
-                />
-              </div>
             </div>
             <IconButton type='button' onClick={handleClose} className='absolute right-4 top-4'>
               <IconX />
