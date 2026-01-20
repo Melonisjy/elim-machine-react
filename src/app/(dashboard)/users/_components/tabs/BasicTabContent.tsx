@@ -27,7 +27,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const { mutateAsync: mutateBasicAsync } = useMutateSingleMember<UserBasicDtoType>(userId.toString(), 'basic')
   const { data: licenseFilter } = useGetLicenseFilter()
-  const licenseNameOption = licenseFilter?.map(v => ({ value: v.name, label: v.name }))
+  const licenseNameOption = licenseFilter?.map(v => ({ value: v.englishName, label: v.name }))
 
   const form = useForm<UserBasicDtoType>({
     defaultValues: {
