@@ -11,6 +11,7 @@ import { handleApiError } from '@core/utils/errorHandler'
 import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
+import { contractTypeOption, laborFormOption, mapLabelToValue, officeDepartmentNameOption, officePositionOption, workFormOption } from '@/@core/data/options'
 
 interface OfficeTabContentProps {
   defaultData: UserOfficeDtoType
@@ -27,13 +28,13 @@ const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultDa
     defaultValues: {
       ...defaultData,
       staffNum: defaultData.staffNum ?? '',
-      department: defaultData.department ?? '',
-      position: defaultData.position ?? '',
+      department: mapLabelToValue(officeDepartmentNameOption, defaultData.department),
+      position: mapLabelToValue(officePositionOption, defaultData.position),
       apprentice: defaultData.apprentice ?? '',
-      contractType: defaultData.contractType ?? '',
+      contractType: mapLabelToValue(contractTypeOption, defaultData.contractType),
       contractYn: defaultData.contractYn ?? '',
-      workForm: defaultData.workForm ?? '',
-      laborForm: defaultData.laborForm ?? '',
+      workForm: mapLabelToValue(workFormOption, defaultData.workForm),
+      laborForm: mapLabelToValue(laborFormOption, defaultData.laborForm),
       fieldworkYn: defaultData.fieldworkYn ?? '',
       staffCardYn: defaultData.staffCardYn ?? '',
       joinDate: defaultData.joinDate ?? '',

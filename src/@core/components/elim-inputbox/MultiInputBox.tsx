@@ -65,7 +65,12 @@ export default function MultiInputBox<T extends Record<string, any>>({
                 select: {
                   displayEmpty: true,
                   renderValue: v => {
-                    const foundOption = option?.find(p => p.value === v)
+                    const normalizedValue = String(v ?? '').toUpperCase()
+
+                    const foundOption = option?.find(p =>
+                      String(p.value ?? '').toUpperCase() === normalizedValue ||
+                      String(p.label ?? '').toUpperCase() === normalizedValue
+                    )
 
                     return foundOption ? (
                       <Typography variant='inherit'>{foundOption.label}</Typography>

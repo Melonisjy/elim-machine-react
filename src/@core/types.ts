@@ -191,13 +191,13 @@ export type UserDetailResponseDtoType = {
   userPrivacyResponseDto: UserPrivacyDtoType
 }
 
-export type PermissionKey = 
-| 'customer_menu'
-| 'customer_detail'
-| 'fms_id_manage'
-| 'contract_menu'
-| 'counseling_menu'
-| 'income_view'
+export type PermissionKey =
+  | 'customer_menu'
+  | 'customer_detail'
+  | 'fms_id_manage'
+  | 'contract_menu'
+  | 'counseling_menu'
+  | 'income_view'
 
 export interface UserBasicDtoType {
   licenseName: string
@@ -261,12 +261,12 @@ export interface UserCareerDtoType {
   }
 }
 
-export type BenefitKey = 
-| 'youthJobLeap'
-| 'youthEmploymentIncentive'
-| 'youthDigital'
-| 'seniorInternship'
-| 'newMiddleAgedJobs'
+export type BenefitKey =
+  | 'youthJobLeap'
+  | 'youthEmploymentIncentive'
+  | 'youthDigital'
+  | 'seniorInternship'
+  | 'newMiddleAgedJobs'
 
 export interface UserEtcDtoType {
   benefits: Record<BenefitKey, string>
@@ -1799,6 +1799,7 @@ export type engineerTypeType = 'MACHINE' | 'SAFETY'
 export type gradeType = 'ASSIST' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
 
 export type memberStatusType = 'NORMAL' | 'QUIT' | 'PENDING' | 'LEAVE'
+
 // php
 export type userStatusType = 'NORMAL' | 'QUIT' | 'PENDING' | 'LEAVE'
 

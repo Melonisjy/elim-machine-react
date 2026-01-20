@@ -90,8 +90,6 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
 
-  console.log(searchParams.toString());
-  
 
   const currentUserId = useCurrentUserStore(set => set.currentUser)?.userId
 
@@ -102,12 +100,12 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
     setContextMenu(
       contextMenu === null
         ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-            row: rowInfo
-          }
+          mouseX: event.clientX + 2,
+          mouseY: event.clientY - 6,
+          row: rowInfo
+        }
         : // 닫힌 상태에서 다시 열릴 때 위치를 재설정하여 메뉴가 제대로 표시되도록 함
-          null
+        null
     )
   }
 
@@ -335,9 +333,9 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                         list.length < 3
                           ? list.join(', ')
                           : list
-                              .slice(0, 2)
-                              .join(', ')
-                              .concat(` 외 ${list.length - 2}`)
+                            .slice(0, 2)
+                            .join(', ')
+                            .concat(` 외 ${list.length - 2}`)
                     }
 
                     // 3. Exception이 아닌 경우

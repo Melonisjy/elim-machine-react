@@ -12,7 +12,7 @@ import MenuItem from '@mui/material/MenuItem'
 
 import { IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
 
-import { Backdrop, CircularProgress, Typography } from '@mui/material'
+import { Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -122,8 +122,8 @@ export default function Licensepage() {
         lastPageAfter > 0
           ? setQueryParams({ page: lastPageAfter })
           : updateParams(params => {
-              params.delete('page')
-            })
+            params.delete('page')
+          })
       }
     },
     [page, setQueryParams, totalCount, size, updateParams]
@@ -270,9 +270,11 @@ export default function Licensepage() {
             </Button>
           </div>
         </div>
-        <Typography color='warning.main' sx={{ px: 3 }}>
-          ※우클릭으로 삭제할 수 있습니다
-        </Typography>
+        <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
+          <Typography variant="body2">
+            행을 우클릭하거나 선택삭제 버튼을 사용하여 직원을 삭제할 수 있습니다.
+          </Typography>
+        </Alert>
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
           <BasicTable<LicensePageResponseDtoType>

@@ -11,6 +11,7 @@ import { handleApiError } from '@core/utils/errorHandler'
 import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
+import { mapLabelToValue, nationalityOption } from '@/@core/data/options'
 
 interface PrivacyTabContentProps {
   defaultData: UserPrivacyDtoType
@@ -28,7 +29,7 @@ const PrivacyTabContent = forwardRef<refType, PrivacyTabContentProps>(({ default
   const form = useForm<UserPrivacyDtoType>({
     defaultValues: {
       ...defaultData,
-      nationality: defaultData.nationality ?? '',
+      nationality: mapLabelToValue(nationalityOption, defaultData.nationality),
       juminNum: defaultData.juminNum ?? '',
       birthday: defaultData.birthday ?? '',
       phoneNumber: defaultData.phoneNumber ?? '',

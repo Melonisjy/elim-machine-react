@@ -2,10 +2,12 @@ import {
   companyNameOption,
   contractTypeOption,
   gradeOption,
-  memberStatusOption,
+  nationalityOption,
   officeDepartmentNameOption,
   officePositionOption,
-  workFormOption
+  userStatusOption,
+  workFormOption,
+  YNOption
 } from '@/@core/data/options'
 import type { userInputInfoType } from '../../types'
 
@@ -32,7 +34,7 @@ export const MEMBER_INPUT_INFO: userInputInfoType = {
       size: 'md',
       type: 'multi',
       label: '재직 상태',
-      options: memberStatusOption
+      options: userStatusOption
     },
     remark: {
       size: 'lg',
@@ -43,8 +45,9 @@ export const MEMBER_INPUT_INFO: userInputInfoType = {
   privacy: {
     nationality: {
       size: 'md',
-      type: 'yn',
-      label: '외국인 여부'
+      type: 'multi',
+      label: '국적',
+      options: nationalityOption
     },
     juminNum: {
       size: 'md',
@@ -104,7 +107,8 @@ export const MEMBER_INPUT_INFO: userInputInfoType = {
     carOwned: {
       size: 'md',
       type: 'yn',
-      label: '차량 보유 여부'
+      label: '차량 보유 여부',
+      options: YNOption
     },
     carNumber: {
       size: 'md',
@@ -221,17 +225,17 @@ export const MEMBER_INPUT_INFO: userInputInfoType = {
       label: '직무분야'
     },
     preJoinExperienceMonth: {
-        industrySameMonth: {
-          size: 'md',
-          type: 'number',
-          label: '동종업계 경력(월)'
-        },
-        industryOtherMonth: {
-          size: 'md',
-          type: 'number',
-          label: '타업계 경력(월)'
-        }
+      industrySameMonth: {
+        size: 'md',
+        type: 'number',
+        label: '동종업계 경력(월)'
       },
+      industryOtherMonth: {
+        size: 'md',
+        type: 'number',
+        label: '타업계 경력(월)'
+      }
+    },
     certNum1: {
       size: 'md',
       type: 'text',
