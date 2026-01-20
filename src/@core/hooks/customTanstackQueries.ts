@@ -76,9 +76,13 @@ import type {
   targetType,
   WindMeasurementResponseDtoType,
   UserResponseDtoType,
-  UserDetailResponseDtoType,
   LoginLogDtoType,
-  PhpApiResponseDtoType
+  PhpApiResponseDtoType,
+  UserBasicDtoType,
+  UserPrivacyDtoType,
+  UserOfficeDtoType,
+  UserCareerDtoType,
+  UserEtcDtoType
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -2278,8 +2282,9 @@ const createQueryHook = <T>(
         .then(v => {
           if (v.data.success && v.data.data) {
             return v.data.data
-        }
-      throw new Error(v.data.message || errorMessage)})
+          }
+          throw new Error(v.data.message || errorMessage)
+        })
 
       console.log(`!!! queryFn ${keyType} ${params}:`)
       return response
@@ -2338,7 +2343,6 @@ export const useGetLoginLogs = createQueryHook<PhpApiResponseDtoType<LoginLogDto
   '로그인 기록 조회 실패'
 )
 
-
 // GET /api/web/audit/users
 export const useGetUsers = createQueryHook<UserResponseDtoType>(
   '/api/web/audit/users',
@@ -2346,11 +2350,39 @@ export const useGetUsers = createQueryHook<UserResponseDtoType>(
   '직원 조회 실패'
 )
 
-// GET /api/web/user/{userId}
-export const useGetSingleUser = createDetailQueryHook<UserDetailResponseDtoType>(
-  userId => `/api/web/user/${userId}`,
-  QUERY_KEYS.USER.GET_SINGLE_USER,
-  '직원 상세 조회 실패'
+// GET /api/web/user/{userId}/basic
+export const useGetUserBasic = createDetailQueryHook<UserBasicDtoType>(
+  userId => `/api/web/user/${userId}/basic`,
+  QUERY_KEYS.USER.GET_USER_BASIC,
+  '기본정보 조회 실패'
+)
+
+// GET /api/web/user/{userId}/privacy
+export const useGetUserPrivacy = createDetailQueryHook<UserPrivacyDtoType>(
+  userId => `/api/web/user/${userId}/privacy`,
+  QUERY_KEYS.USER.GET_USER_PRIVACY,
+  '개인정보 조회 실패'
+)
+
+// GET /api/web/user/{userId}/office
+export const useGetUserOffice = createDetailQueryHook<UserOfficeDtoType>(
+  userId => `/api/web/user/${userId}/office`,
+  QUERY_KEYS.USER.GET_USER_OFFICE,
+  '재직정보 조회 실패'
+)
+
+// GET /api/web/user/{userId}/career
+export const useGetUserCareer = createDetailQueryHook<UserCareerDtoType>(
+  userId => `/api/web/user/${userId}/career`,
+  QUERY_KEYS.USER.GET_USER_CAREER,
+  '경력정보 조회 실패'
+)
+
+// GET /api/web/user/{userId}/etc
+export const useGetUserEtc = createDetailQueryHook<UserEtcDtoType>(
+  userId => `/api/web/user/${userId}/etc`,
+  QUERY_KEYS.USER.GET_USER_ETC,
+  '기타정보 조회 실패'
 )
 
 // GET /api/web/audit/licenses
