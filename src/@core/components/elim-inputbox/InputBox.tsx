@@ -9,7 +9,7 @@ import type { BoxSizeType, InputFieldType, ynResultType } from '@core/types'
 import { MemberIdContext } from '@/app/(dashboard)/member/_components/UserModal'
 import { handleApiError } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
-import { useGetLicenseNames } from '@core/hooks/customTanstackQueries'
+import { useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import YNSelectBox from './YNSelectBox'
 import PostCodeButton from '../elim-button/PostCodeButton'
 
@@ -65,8 +65,8 @@ function InputBoxContent() {
   const disabled = props?.disabled ?? tabField?.disabled ?? false
 
   // 회사명 옵션
-  const { data: licenseNames } = useGetLicenseNames()
-  const companyNameOption = licenseNames?.map(v => ({ value: v.licenseName, label: v.licenseName }))
+  const { data: licenseFilter } = useGetLicenseFilter()
+  const companyNameOption = licenseFilter?.map(v => ({ value: v.name, label: v.name }))
 
   // 주민번호 핸들링
   const [juminNum, setJuminNum] = useState(value)
@@ -159,7 +159,7 @@ function InputBoxContent() {
           }}
         >
           <MenuItem value=''>전체</MenuItem>
-          {(tabFieldKey === 'companyName' ? companyNameOption : tabField?.options)?.map(option => (
+          {(tabFieldKey === 'licenseName' ? companyNameOption : tabField?.options)?.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
