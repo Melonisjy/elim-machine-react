@@ -21,7 +21,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Style Imports
 import UserModal from './_components/UserModal'
-import type { MemberFilterType, UserDetailResponseDtoType, UserDtoType } from '@core/types'
+import type { MemberFilterType, UserDtoType } from '@core/types'
 import BasicTable from '@/@core/components/elim-table/BasicTable'
 import SearchBar from '@/@core/components/elim-inputbox/SearchBar'
 import { MEMBER_FILTER_INFO } from '@core/data/filter/memberFilterInfo'
@@ -30,7 +30,7 @@ import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import AddUserModal from './_components/AddUserModall'
-import { useGetSingleUser, useGetUsers } from '@core/hooks/customTanstackQueries'
+import { useGetUsers } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import { printErrorSnackbar } from '@core/utils/snackbarHandler'
@@ -60,101 +60,11 @@ export default function UsersPage() {
 
   const totalCount = usersPages?.total ?? 0
 
-  const createMockUserData = (userSeq: number, userData?: UserDtoType): UserDetailResponseDtoType => {
-    return {
-      userId: userSeq,
-      userBasicResponseDto: {
-        licenseName: userData?.affiliation || '테스트 라이선스',
-        name: userData?.name || '테스트 사용자',
-        role: 'USER',
-        status: userData?.status || 'NORMAL',
-        email: userData?.email || 'test@example.com',
-        avatarFileName: '',
-        remark: '',
-        permission: {
-          customer_menu: 'Y',
-          customer_detail: 'Y',
-          fms_id_manage: 'N',
-          contract_menu: 'Y',
-          counseling_menu: 'Y',
-          income_view: 'N'
-        }
-      },
-      userPrivacyResponseDto: {
-        nationality: 'KOREA',
-        juminNum: '000000-0000000',
-        birthday: '1990-01-01',
-        phoneNumber: userData?.mobile || '010-0000-0000',
-        emergency1: '010-1111-1111',
-        emergency2: null,
-        address: '서울특별시 강남구',
-        educationLevel: 'UNIVERSITY',
-        educationMajor: '컴퓨터공학',
-        familyCnt: 2,
-        carOwned: 'Y',
-        carNumber: '12가3456',
-        suwonCarReg: 0,
-        carModel: '소나타',
-        religion: '',
-        bankName: 'KB국민은행',
-        bankNumber: '123456-78-901234'
-      },
-      userOfficeResponseDto: {
-        staffNum: userData?.staffNum || 'S001',
-        department: userData?.department || '개발팀',
-        team: '프론트엔드팀',
-        task: '프론트엔드 개발',
-        position: userData?.position || '사원',
-        contractType: 'REGULAR',
-        apprentice: 'N',
-        workForm: 'DEEMED',
-        laborForm: 'RESIDENT',
-        joinDate: userData?.joinDate || '2020-01-01',
-        resignDate: null,
-        insurancesAcquisitionDate: '2020-01-01',
-        insurancesLossDate: null,
-        years: userData?.tenureYears || 5,
-        contractYn: 'Y',
-        staffCardYn: 'Y',
-        fieldworkYn: 'N'
-      },
-      userCareerResponseDto: {
-        jobField: 'IT',
-        jobGrade: 'INTERMEDIATE',
-        certNum1: 'CERT001',
-        certNum2: 'CERT002',
-        preJoinExperienceMonth: {
-          industrySameMonth: 24,
-          industryOtherMonth: 12
-        }
-      },
-      userEtcResponseDto: {
-        benefits: {
-          youthJobLeap: '',
-          youthEmploymentIncentive: '',
-          youthDigital: '',
-          seniorInternship: '',
-          newMiddleAgedJobs: ''
-        },
-        incomeTaxReduction: {
-          beginDate: '',
-          endDate: '',
-          employedType: '',
-          militaryPeriod: ''
-        },
-        registeredAt: '2020-01-01T00:00:00',
-        lastLoginAt: new Date().toISOString()
-      }
-    }
-  }
   // 모달 관련 상태
   const [addUserModalOpen, setAddUserModalOpen] = useState(false)
   const [userDetailModalOpen, setUserDetailModalOpen] = useState(false)
   const [userId, setUserId] = useState(0)
 
-
-  // const { data: selectedUser } = useGetSingleUser(userId.toString())
-  const selectedUser = userId > 0 ? createMockUserData(userId, data.find(u => u.userSeq === userId)) : undefined
 
   // 선택삭제 기능 관련
   const [showCheckBox, setShowCheckBox] = useState(false)
@@ -490,7 +400,7 @@ export default function UsersPage() {
         </div>
         <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
           <Typography variant="body2">
-            행을 우클릭하거나 선택 삭제 버튼을 사용하여 직원을 삭제할 수 있습니다.
+            행을 우클릭하거나 선택삭제 버튼을 사용하여 직원을 삭제할 수 있습니다.
           </Typography>
         </Alert>
         {/* 테이블 */}
@@ -526,11 +436,11 @@ export default function UsersPage() {
           }}
         />
       )}
-      {userDetailModalOpen && selectedUser && (
+      {userDetailModalOpen && userId > 0 && (
         <UserModal
           open={userDetailModalOpen}
           setOpen={setUserDetailModalOpen}
-          selectedUserData={selectedUser}
+          userId={userId}
           onDelete={() => adjustPage(-1)}
           reloadPages={removeQueryCaches}
         />

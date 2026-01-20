@@ -12,6 +12,7 @@ import { useSavedTabsContext, UserIdContext, type refType } from '../UserModal'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
 import MultiInputBox from '@/@core/components/elim-inputbox/MultiInputBox'
+import { mapLabelToValue, userStatusOption } from '@/@core/data/options'
 
 interface BasicTabContentProps {
   defaultData: UserBasicDtoType
@@ -25,7 +26,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
   const { currentUser, setCurrentUserName } = useCurrentUserStore()
 
   const { mutateAsync: mutateBasicAsync } = useMutateSingleMember<UserBasicDtoType>(userId.toString(), 'basic')
-  const { data: licenseNames } = useGetLicenseNames()
+  const { data: licenseNames } = useGetLicenseNames() // 추후 api 교체 필요
   const licenseNameOption = licenseNames?.map(v => ({ value: v.licenseName, label: v.licenseName }))
 
   const form = useForm<UserBasicDtoType>({
@@ -34,7 +35,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
       name: defaultData.name ?? '',
       email: defaultData.email ?? '',
       licenseName: defaultData.licenseName ?? '',
-      status: defaultData.status ?? '',
+      status: mapLabelToValue(userStatusOption, defaultData.status),
       remark: defaultData.remark ?? ''
     }
   })
@@ -52,7 +53,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
         name: newBasic.name ?? '',
         email: newBasic.email ?? '',
         licenseName: newBasic.licenseName ?? '',
-        status: newBasic.status ?? '',
+        status: mapLabelToValue(userStatusOption, newBasic.status),
         remark: newBasic.remark ?? ''
       })
 

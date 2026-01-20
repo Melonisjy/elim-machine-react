@@ -20,7 +20,7 @@ import { useGetLicenseNames } from '@core/hooks/customTanstackQueries'
 import styles from '@core/styles/customTable.module.css'
 import TextFieldTd from '@/@core/components/elim-inputbox/TextFieldTd'
 import SelectTd from '@/@core/components/elim-inputbox/SelectTd'
-import { memberStatusOption } from '@/@core/data/options'
+import { userStatusOption } from '@/@core/data/options'
 
 type AddUserModalProps = {
   open: boolean
@@ -32,7 +32,7 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
   const [loading, setLoading] = useState(false)
 
   const { data: licenses } = useGetLicenseNames()
-  const companyNameOption = licenses?.map(v => ({ label: v.companyName, value: v.companyName }))
+  const companyNameOption = licenses?.map(v => ({ label: v.licenseName, value: v.licenseName }))
 
   const form = useForm<MemberCreateRequestDtoType>({
     defaultValues: {
@@ -99,7 +99,7 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
             </tr>
             <tr>
               <th>재직상태</th>
-              <SelectTd form={form} name='memberStatus' option={memberStatusOption} />
+              <SelectTd form={form} name='memberStatus' option={userStatusOption} />
             </tr>
           </tbody>
         </table>
