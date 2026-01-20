@@ -123,7 +123,11 @@ export const QUERY_KEYS = {
 
   // NEW !!!
   USER: {
-    GET_SINGLE_USER: (userId: string) => ['GET_SINGLE_USER', userId],
-    GET_USERS: (queryParams: string) => ['GET_USERS', refineParams(queryParams)]
+    GET_USERS: (queryParams: string) => ['GET_USERS', refineParams(queryParams)],
+    GET_USER_BASIC: (userId: string) => ['GET_USER_BASIC', userId],
+    GET_USER_PRIVACY: (userId: string) => ['GET_USER_PRIVACY', userId],
+    GET_USER_OFFICE: (userId: string) => ['GET_USER_OFFICE', userId],
+    GET_USER_CAREER: (userId: string) => ['GET_USER_CAREER', userId],
+    GET_USER_ETC: (userId: string) => ['GET_USER_ETC', userId]
   }
 }
