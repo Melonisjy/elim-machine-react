@@ -12,7 +12,6 @@ import type {
   safetyInspectionTypeType,
   checkTypeType,
   safetyGradeType,
-  memberStatusType,
   ynResultType,
   genderType,
   buildingGradeType,
@@ -22,7 +21,8 @@ import type {
   workStatusType,
   facilityClassificationType,
   facilityClassType,
-  facilityTypeType
+  facilityTypeType,
+  userStatusType
 } from '@core/types'
 
 type OptionType<T> = { value: T; label: string }[]
@@ -31,6 +31,10 @@ export const YNOption: OptionType<ynResultType> = [
   { value: 'Y', label: '예' },
   { value: 'N', label: '아니오' }
 ]
+
+export const mapLabelToValue = (options: { label: string, value: string }[], label?: string): string => {
+  return options.find(opt => opt.label === label)?.value ?? label ?? '';
+}
 
 // member
 // 해당 옵션은 실제로 사용되지 않음. InputBox에서 실제 라이선스 리스트를 가져와서 사용하기 때문.
@@ -45,11 +49,16 @@ export const roleOption = [
   { value: 'SUPERADMIN', label: '최고 관리자' }
 ]
 
-export const memberStatusOption: OptionType<memberStatusType> = [
-  { value: 'NORMAL', label: '재직중' },
-  { value: 'QUIT', label: '퇴사' },
-  { value: 'PENDING', label: '가입 승인대기' },
-  { value: 'LEAVE', label: '휴직' }
+export const memberStatusOption: OptionType<userStatusType> = [
+  { value: 'Normal', label: '재직중' },
+  { value: 'Quit', label: '퇴사' },
+  { value: 'Pending', label: '가입 승인대기' },
+  { value: 'Leave', label: '휴직' }
+]
+
+export const nationalityOption = [
+  { value: 'Korean', label: '내국인' },
+  { value: 'Foreigner', label: '외국인' }
 ]
 
 export const officeDepartmentNameOption = [
