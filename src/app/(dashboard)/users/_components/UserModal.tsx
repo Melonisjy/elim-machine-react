@@ -26,7 +26,7 @@ import type { UserDetailResponseDtoType } from '@core/types'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import DeleteModal from '@/@core/components/elim-modal/DeleteModal'
 import { auth } from '@core/utils/auth'
-import type { UserType } from '@core/hooks/customTanstackQueries'
+import { useGetUserBasic, useGetUserCareer, useGetUserEtc, useGetUserOffice, useGetUserPrivacy, type UserType } from '@core/hooks/customTanstackQueries'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import AlertModal from '@/@core/components/elim-modal/AlertModal'
 import BasicTabContent from './tabs/BasicTabContent'
@@ -61,25 +61,25 @@ const requestRule: Record<tabType, requestRuleBodyType> = {
     dtoKey: 'userBasicResponseDto'
   },
   '2': {
-    url: '/user-privacy',
+    url: '/privacy',
     label: '개인정보',
     value: 'privacy',
     dtoKey: 'userPrivacyResponseDto'
   },
   '3': {
-    url: '/user-office',
+    url: '/office',
     label: '재직정보',
     value: 'office',
     dtoKey: 'userOfficeResponseDto'
   },
   '4': {
-    url: '/user-career',
+    url: '/career',
     label: '경력정보',
     value: 'career',
     dtoKey: 'userCareerResponseDto'
   },
   '5': {
-    url: '/user-etc',
+    url: '/etc',
     label: '기타정보',
     value: 'etc',
     dtoKey: 'userEtcResponseDto'
@@ -89,7 +89,7 @@ const requestRule: Record<tabType, requestRuleBodyType> = {
 type EditUserInfoProps = {
   open: boolean
   setOpen: (open: boolean) => void
-  selectedUserData: UserDetailResponseDtoType
+  userId: number
   onDelete?: () => void
   reloadPages?: () => void
 }
@@ -109,7 +109,7 @@ export const useSavedTabsContext = () => {
   return savedTabs
 }
 
-const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: EditUserInfoProps) => {
+const UserModal = ({ open, setOpen, userId, onDelete, reloadPages }: EditUserInfoProps) => {
   const changedEvenOnce = useRef(false)
 
   const [tabValue, setTabValue] = useState<tabType>('1')
@@ -127,6 +127,28 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
   const officeTabRef = useRef<refType>(null)
   const careerTabRef = useRef<refType>(null)
   const etcTabRef = useRef<refType>(null)
+
+  const { data: basicData, isLoading: isLoadingBasic } = useGetUserBasic(
+    open && userId > 0 && (tabValue === '1' || basicTabRef.current?.dirty)
+      ? userId.toString()
+      : '0'
+  )
+
+  const { data: privacyData, isLoading: isLoadingPrivacy } = useGetUserPrivacy(
+    open && userId > 0 && tabValue === '2' ? userId.toString() : '0'
+  )
+
+  const { data: officeData, isLoading: isLoadingOffice } = useGetUserOffice(
+    open && userId > 0 && tabValue === '3' ? userId.toString() : '0'
+  )
+
+  const { data: careerData, isLoading: isLoadingCareer } = useGetUserCareer(
+    open && userId > 0 && tabValue === '4' ? userId.toString() : '0'
+  )
+
+  const { data: etcData, isLoading: isLoadingEtc } = useGetUserEtc(
+    open && userId > 0 && tabValue === '5' ? userId.toString() : '0'
+  )
 
   const getIsDirty = useCallback(() => {
     return (
@@ -152,8 +174,6 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
 
     return () => clearInterval(interval)
   }, [getIsDirty])
-
-  const userId = selectedUserData.userId
 
   // 로그인한 사용자의 userModal인지 파악
   const currentuserId = useCurrentUserStore(set => set.currentUser)?.userId
@@ -276,9 +296,9 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
           <DialogTitle sx={{ position: 'relative' }}>
             <div className='flex flex-col w-full grid place-items-center'>
               <Typography variant='h3'>
-                {selectedUserData?.userBasicResponseDto?.name || '사용자 정보 수정'}
+                {basicData?.name || '사용자 정보 수정'}
               </Typography>
-              <Typography variant='subtitle1'>{selectedUserData?.userBasicResponseDto?.licenseName || ''}</Typography>
+              <Typography variant='subtitle1'>{basicData?.licenseName || ''}</Typography>
             </div>
             <IconButton type='button' onClick={handleClose} className='absolute right-4 top-4'>
               <IconX />
@@ -302,19 +322,39 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
                 </TabList>
                 <div className='flex-1 overflow-y-auto pt-5'>
                   <TabPanel value='1' keepMounted>
-                    <BasicTabContent ref={basicTabRef} defaultData={selectedUserData.userBasicResponseDto} />
+                    {isLoadingBasic ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      basicData && <BasicTabContent ref={basicTabRef} defaultData={basicData} />
+                    )}
                   </TabPanel>
                   <TabPanel value='2' keepMounted>
-                    <PrivacyTabContent ref={privacyTabRef} defaultData={selectedUserData.userPrivacyResponseDto} />
+                    {isLoadingPrivacy ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      privacyData && <PrivacyTabContent ref={privacyTabRef} defaultData={privacyData} />
+                    )}
                   </TabPanel>
                   <TabPanel value='3' keepMounted>
-                    <OfficeTabContent ref={officeTabRef} defaultData={selectedUserData.userOfficeResponseDto} />
+                    {isLoadingOffice ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      officeData && <OfficeTabContent ref={officeTabRef} defaultData={officeData} />
+                    )}
                   </TabPanel>
                   <TabPanel value='4' keepMounted>
-                    <CareerTabContent ref={careerTabRef} defaultData={selectedUserData.userCareerResponseDto} />
+                    {isLoadingCareer ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      careerData && <CareerTabContent ref={careerTabRef} defaultData={careerData} />
+                    )}
                   </TabPanel>
                   <TabPanel value='5' keepMounted>
-                    <EtcTabContent ref={etcTabRef} defaultData={selectedUserData.userEtcResponseDto} />
+                    {isLoadingEtc ? (
+                      <div>로딩 중...</div>
+                    ) : (
+                      etcData && <EtcTabContent ref={etcTabRef} defaultData={etcData} />
+                    )}
                   </TabPanel>
                 </div>
               </div>
@@ -341,11 +381,11 @@ const UserModal = ({ open, setOpen, selectedUserData, onDelete, reloadPages }: E
             confirmMessage='폐기'
           />
         )}
-        {openForgetPW && (
+        {openForgetPW && basicData && (
           <ForgotPwModal
             open={openForgetPW}
             setOpen={setOpenForgotPW}
-            userEmail={selectedUserData.userBasicResponseDto.email}
+            userEmail={basicData.email}
           />
         )}
       </savedTabsContext.Provider>
