@@ -30,7 +30,7 @@ import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import AddUserModal from './_components/AddUserModall'
-import { useGetUsers } from '@core/hooks/customTanstackQueries'
+import { useGetLicenseFilter, useGetUsers } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import { printErrorSnackbar } from '@core/utils/snackbarHandler'
@@ -49,6 +49,7 @@ export default function UsersPage() {
   const queryClient = useQueryClient()
 
   const { data: usersPages, refetch: refetchPages, isLoading, isError } = useGetUsers(searchParams.toString())
+  const { data: licenseFilter } = useGetLicenseFilter()
 
   const data = usersPages?.items ?? []
 
@@ -105,24 +106,23 @@ export default function UsersPage() {
         if (filterInfo.type === 'multi') {
           const values = filterValue.split(',')
           values.forEach(value => {
-            const option = filterInfo.options?.find(opt => opt.value === value)
-            const displayValue = option ? option.label : value
+            let displayValue: string
+
+            // licenseName인 경우 동적 데이터에서 찾기
+            if (filterKey === 'licenseName') {
+              const license = licenseFilter?.find(l => l.englishName === value)
+              displayValue = license?.name ?? value
+            } else {
+              const option = filterInfo.options?.find(opt => String(opt.value) === value)
+              displayValue = option ? option.label : value
+            }
+
             activeFilters.push({
               key: filterKey,
               label: filterLabel,
               value: value,
               displayValue: displayValue
             })
-          })
-        } else {
-          // single 타입인 경우
-          const option = filterInfo.options?.find(opt => opt.value === filterValue)
-          const displayValue = option ? option.label : filterValue
-          activeFilters.push({
-            key: filterKey,
-            label: filterLabel,
-            value: filterValue,
-            displayValue: displayValue
           })
         }
       }
@@ -140,7 +140,7 @@ export default function UsersPage() {
     }
 
     return activeFilters
-  }, [searchParams])
+  }, [searchParams, licenseFilter])
 
   // 특정 필터 제거 함수
   const removeFilter = useCallback(
