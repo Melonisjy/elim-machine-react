@@ -1801,7 +1801,7 @@ export type gradeType = 'ASSIST' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'E
 export type memberStatusType = 'NORMAL' | 'QUIT' | 'PENDING' | 'LEAVE'
 
 // php
-export type userStatusType = 'Normal' | 'Quit' | 'Pending' | 'Leave'
+export type userStatusType = 'NORMAL' | 'QUIT' | 'PENDING' | 'LEAVE'
 
 export type reportStatusType = 'PENDING' | 'COMPLETED' | 'FAILED'
 
