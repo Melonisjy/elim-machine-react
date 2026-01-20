@@ -2391,3 +2391,26 @@ export const useGetLicenses = createQueryHook<PhpApiResponseDtoType<LicensePageR
   QUERY_KEYS.LICENSE.GET_LICENSES,
   '라이선스 조회 실패'
 )
+
+// GET /api/web/users/licenseFilter
+export const useGetLicenseFilter = () => {
+  return useQuery({
+    queryKey: ['GET_LICENSE_FILTER'],
+    queryFn: async () => {
+      const response = await phpAuth
+        .get<PhpApiResult<{ items: { licenseSeq: number; name: string; englishName: string }[] }>>(
+          '/api/web/users/licenseFilter'
+        )
+        .then(v => {
+          if (v.data.success && v.data.data) {
+            return v.data.data.items
+          }
+          throw new Error(v.data.message || '라이선스 필터 조회 실패')
+        })
+
+      console.log('!!! queryFn GET_LICENSE_FILTER:')
+      return response
+    },
+    staleTime: 1000 * 60 * 5 // 5분
+  })
+}
