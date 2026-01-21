@@ -46,7 +46,13 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const handleSave = form.handleSubmit(async data => {
     try {
-      const newBasic = await mutateBasicAsync(data)
+      const selectedLicense = licenseFilter?.find(l => l.englishName === data.licenseName)
+
+      const requestData = {
+        ...data,
+        licenseSeq: selectedLicense?.licenseSeq,
+      }
+      const newBasic = await mutateBasicAsync(requestData as unknown as UserBasicDtoType)
 
       form.reset({
         ...newBasic,
