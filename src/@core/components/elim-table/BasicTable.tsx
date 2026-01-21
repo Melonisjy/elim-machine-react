@@ -159,7 +159,7 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
         <TableHead className='select-none'>
           <TableRow sx={{ zIndex: '2' }}>
             {showCheckBox && handleCheckAllItems && (
-              <StyledTableCell>
+              <StyledTableCell sx={{ width: '70px', minWidth: '50px' }}>
                 <Checkbox
                   sx={{ padding: 0 }}
                   onChange={e => {
