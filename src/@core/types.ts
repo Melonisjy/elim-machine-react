@@ -29,6 +29,7 @@ export interface HeaderInfoType {
   label: string
   canSort: boolean
   hideOnTablet?: boolean
+  width?: string | number
 }
 
 // table header 정보
@@ -162,7 +163,7 @@ export type UserDtoType = {
   role: string,
   name: string,
   staffNum: string,
-  affiliation: string,
+  licenseName: string,
   department: string,
   position: string,
   age: number,
@@ -1713,7 +1714,7 @@ export interface LoginLogDtoType {
   regTime: string
   email: string
   name: string
-  affiliation: string
+  licenseName: string
   mobile: string
   countryCode: string
   ipAddr: string
