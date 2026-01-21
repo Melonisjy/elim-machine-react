@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import type { UserOfficeDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
-import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
+import { useMutateSingleUser } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
 import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
@@ -20,7 +20,7 @@ interface OfficeTabContentProps {
 const OfficeTabContent = forwardRef<refType, OfficeTabContentProps>(({ defaultData }, ref) => {
   const userId = useContext(UserIdContext)
 
-  const { mutateAsync: mutateOfficeAsync } = useMutateSingleMember<UserOfficeDtoType>(userId.toString(), 'office')
+  const { mutateAsync: mutateOfficeAsync } = useMutateSingleUser<UserOfficeDtoType>(userId.toString(), 'office')
 
   const savedTabs = useSavedTabsContext()
 

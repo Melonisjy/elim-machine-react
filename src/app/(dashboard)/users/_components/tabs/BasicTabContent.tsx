@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import type { UserBasicDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
-import { useGetLicenseFilter, useGetLicenseNames, useMutateSingleMember } from '@core/hooks/customTanstackQueries'
+import { useGetLicenseFilter, useMutateSingleUser } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
 import { useSavedTabsContext, UserIdContext, type refType } from '../UserModal'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
@@ -25,7 +25,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const { currentUser, setCurrentUserName } = useCurrentUserStore()
 
-  const { mutateAsync: mutateBasicAsync } = useMutateSingleMember<UserBasicDtoType>(userId.toString(), 'basic')
+  const { mutateAsync: mutateBasicAsync } = useMutateSingleUser<UserBasicDtoType>(userId.toString(), 'basic')
   const { data: licenseFilter } = useGetLicenseFilter()
   const licenseNameOption = licenseFilter?.map(v => ({ value: v.englishName, label: v.name }))
 
