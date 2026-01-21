@@ -63,8 +63,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
         remark: newBasic.remark ?? ''
       })
 
-      // 헤더에서 사용하는 정보 업데이트 (현재 로그인 중인 사용자의 정보라면)
-      if (currentUser && currentUser.userId) {
+      if (currentUser && currentUser.userId === userId) {
         setCurrentUserName(newBasic.name)
       }
 
