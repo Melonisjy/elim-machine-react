@@ -1,5 +1,5 @@
 import type { MouseEvent } from 'react'
-import { useCallback, useContext, useState } from 'react'
+import { useCallback, useContext, useState, useEffect } from 'react'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
@@ -86,9 +86,11 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
   const pathname = usePathname()
   const router = useRouter()
 
-  const sort = searchParams.get('sort')?.split(',')
+  const sortBy = searchParams.get('sortBy')
+  const sortDir = searchParams.get('sortDir')
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
+
 
 
   const currentUserId = useCurrentUserStore(set => set.currentUser)?.userId
@@ -117,26 +119,30 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
     (key: string) => {
       const params = new URLSearchParams(searchParams)
 
-      if (!sort) {
-        params.set('sort', `${key},asc`)
-      } else if (sort[0] === key) {
-        switch (sort[1]) {
-          case 'asc':
-            params.set('sort', `${key},desc`)
+      if (!sortBy) {
+        params.set('sortBy', key)
+        params.set('sortDir', 'ASC');
+      } else if (sortBy === key) {
+        switch (sortDir) {
+          case 'ASC':
+            params.set('sortBy', key)
+            params.set('sortDir', 'DESC');
             break
-          case 'desc':
-            params.delete('sort')
+          case 'DESC':
+            params.delete('sortBy');
+            params.delete('sortDir');
             break
           default:
             break
         }
       } else {
-        params.set('sort', `${key},asc`)
+        params.set('sortBy', key)
+        params.set('sortDir', 'ASC');
       }
 
       router.replace(pathname + '?' + params.toString())
     },
-    [sort, searchParams, router, pathname]
+    [sortBy, sortDir, searchParams, router, pathname]
   )
 
   return (
@@ -149,7 +155,7 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
         maxHeight: '100%'
       }}
     >
-      <Table stickyHeader aria-label='simple table' sx={{ position: 'relative', height: '100%' }}>
+      <Table stickyHeader aria-label='simple table' sx={{ position: 'relative', height: '100%', tableLayout: 'fixed' }}>
         <TableHead className='select-none'>
           <TableRow sx={{ zIndex: '2' }}>
             {showCheckBox && handleCheckAllItems && (
@@ -165,7 +171,7 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
               </StyledTableCell>
             )}
             {!isTablet && (
-              <StyledTableCell align='center' key='order' className='font-medium text-base'>
+              <StyledTableCell align='center' key='order' sx={{ width: '60px' }} className='font-medium text-base'>
                 번호
               </StyledTableCell>
             )}
@@ -186,17 +192,21 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     },
                     { hidden: isTablet && header[k]?.hideOnTablet }
                   )}
-                  sx={isTablet ? { p: 0, py: 2, px: 1 } : {}}
+                  sx={{
+                    ...(isTablet ? { p: 0, py: 2, px: 1 } : {}),
+                    width: header[k]?.width,
+                    minWidth: header[k]?.width
+                  }}
                   onClick={!(loading || error) && header[k]?.canSort ? () => handleSorting(key) : undefined}
                 >
                   <div className='flex items-center justify-center gap-1'>
                     {header[k]?.label}
                     {header[k]?.canSort &&
-                      (sort && sort[0] === k ? (
-                        sort[1] === 'desc' ? (
-                          <ExpandLessOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
-                        ) : (
+                      (sortBy === k ? (
+                        sortDir === 'DESC' ? (
                           <ExpandMoreOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
+                        ) : (
+                          <ExpandLessOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
                         )
                       ) : (
                         <UnfoldMoreIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
