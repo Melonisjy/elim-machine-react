@@ -171,7 +171,7 @@ export type UserDtoType = {
   mobile: string,
   engineerYn: string,
   joinDate: string,
-  tenureYears: number,
+  careerYear: number,
   status: string,
 }
 

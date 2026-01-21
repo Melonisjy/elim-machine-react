@@ -29,7 +29,7 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     email: { label: '이메일', canSort: true, hideOnTablet: true },
     mobile: { label: '휴대폰', canSort: false, hideOnTablet: true, width: '180px' },
     joinDate: { label: '입사일', canSort: true, hideOnTablet: true, width: '180px' },
-    tenureYears: { label: '근속년수', canSort: true, hideOnTablet: true, width: '120px' },
+    careerYear: { label: '근속년수', canSort: true, hideOnTablet: true, width: '120px' },
     status: { label: '상태', canSort: false, hideOnTablet: true, width: '100px' }
   },
 
