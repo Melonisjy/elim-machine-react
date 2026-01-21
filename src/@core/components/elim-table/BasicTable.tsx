@@ -187,8 +187,10 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     'text-base',
                     {
                       'cursor-pointer hover:underline': !(loading || error) && header[k]?.canSort,
-                      'font-bold select-none': header[k]?.canSort,
-                      'font-medium': !header[k]?.canSort
+                      'font-medium select-none': header[k]?.canSort && sortBy !== k,  // ✅ 정렬 가능하지만 현재 정렬 아님
+                      'font-bold select-none': header[k]?.canSort && sortBy === k,    // ✅ 정렬 중인 컬럼만
+                      'font-medium': !header[k]?.canSort,
+                      'underline underline-offset-2': sortBy === k
                     },
                     { hidden: isTablet && header[k]?.hideOnTablet }
                   )}
@@ -204,9 +206,9 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     {header[k]?.canSort &&
                       (sortBy === k ? (
                         sortDir === 'DESC' ? (
-                          <ExpandMoreOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
+                          <ExpandMoreOutlinedIcon className='text-black' sx={{ fontSize: '18px' }} />
                         ) : (
-                          <ExpandLessOutlinedIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
+                          <ExpandLessOutlinedIcon className='text-primary' sx={{ fontSize: '18px' }} />
                         )
                       ) : (
                         <UnfoldMoreIcon className='text-gray-400' sx={{ fontSize: '18px' }} />
