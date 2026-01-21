@@ -187,8 +187,8 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                     'text-base',
                     {
                       'cursor-pointer hover:underline': !(loading || error) && header[k]?.canSort,
-                      'font-medium select-none': header[k]?.canSort && sortBy !== k,  // ✅ 정렬 가능하지만 현재 정렬 아님
-                      'font-bold select-none': header[k]?.canSort && sortBy === k,    // ✅ 정렬 중인 컬럼만
+                      'font-medium select-none': header[k]?.canSort && sortBy !== k,  // 정렬 가능하지만 현재 정렬 아닌 컬럼
+                      'font-bold select-none': header[k]?.canSort && sortBy === k,    // 정렬 중인 컬럼
                       'font-medium': !header[k]?.canSort,
                       'underline underline-offset-2': sortBy === k
                     },
