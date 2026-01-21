@@ -82,7 +82,7 @@ import type {
   UserPrivacyDtoType,
   UserOfficeDtoType,
   UserCareerDtoType,
-  UserEtcDtoType
+  UserEtcDtoType,
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -2412,5 +2412,49 @@ export const useGetLicenseFilter = () => {
       return response
     },
     staleTime: 1000 * 60 * 5 // 5분
+  })
+}
+
+const userRequestInfo: Record<UserType, {
+  url: string;
+  queryKey: (userId: string) => string[]
+}> = {
+  basic: { url: '/basic', queryKey: QUERY_KEYS.USER.GET_USER_BASIC },
+  privacy: { url: '/privacy', queryKey: QUERY_KEYS.USER.GET_USER_PRIVACY },
+  office: { url: '/office', queryKey: QUERY_KEYS.USER.GET_USER_OFFICE },
+  career: { url: '/career', queryKey: QUERY_KEYS.USER.GET_USER_CAREER },
+  etc: { url: '/etc', queryKey: QUERY_KEYS.USER.GET_USER_ETC }
+}
+
+export const useMutateSingleUser = <T>(userId: string, userType: UserType) => {
+  const queryClient = useQueryClient()
+  const requestInfo = userRequestInfo[userType]
+  const queryKey = requestInfo.queryKey(userId)
+
+  const putSingleUser = async (userId: string, data: T) => {
+    if (Number(userId) <= 0) {
+      throw new Error('수정하려는 userId가 0 이하입니다')
+    }
+
+    const response = await phpAuth
+      .put<PhpApiResult<T>>(`/api/web/user/${userId}${requestInfo.url}`, data)
+
+
+    if (response.data?.success === false) {
+      throw new Error(response.data.message || '유저 정보 수정 실패')
+    }
+
+    return response.data?.data ?? data
+  }
+
+  return useMutation<T, AxiosError, T>({
+    mutationFn: data => putSingleUser(userId, data),
+    onSuccess: data => {
+      queryClient.setQueryData(queryKey, data)
+      console.log(`user ${userType} info가 성공적으로 저장되었습니다.`)
+    },
+    onError: error => {
+      console.error(error)
+    }
   })
 }
