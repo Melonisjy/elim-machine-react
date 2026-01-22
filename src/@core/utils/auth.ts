@@ -5,7 +5,15 @@ import axios from 'axios'
 import type { LoginResponseDtoType, TokenResponseDto } from '@core/types'
 import useAccessTokenStore from '@/@core/hooks/zustand/useAuthStore'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
+
 import { API_ERROR_CODES } from '@/@core/constants/apiErrorCodes'
+import { HTTP_STATUS, HTTP_STATUS_RANGE } from '../constants/httpStatusCodes'
+
+// 기계설비용 Java 백엔드 API
+export const auth = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_API_URL}`,
+  withCredentials: true // 👈 쿠키(RefreshToken) 주고받기 위해 필요
+})
 
 // PHP API 공통 응답 형식 (ApiResult)
 export interface PhpApiResult<T = unknown> {
@@ -15,16 +23,10 @@ export interface PhpApiResult<T = unknown> {
   data: T | null
 }
 
-// 기계설비용 Java 백엔드 API
-export const auth = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_API_URL}`,
-  withCredentials: true // 👈 쿠키(RefreshToken) 주고받기 위해 필요
-})
-
 // PHP API용 axios 인스턴스
 export const phpAuth = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_PHP_API_URL}`,
-  withCredentials: true, // credentials: 'include'와 동일 (CORS withCredentials)
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json'
@@ -32,11 +34,11 @@ export const phpAuth = axios.create({
 })
 
 // Constants 
-const AUTH_ENDPOINTS = [
-  '/api/authentication/web/login',
-  '/api/authentication/web/logout',
-  '/api/authentication/web/refresh'
-] as const
+const AUTH_ENDPOINTS = {
+  LOGIN: '/api/web/auth/login',
+  LOGOUT: '/api/web/auth/logout',
+  REFRESH: '/api/web/auth/refresh'
+} as const
 
 /**
  * 로그인 함수 (PHP API 사용)
@@ -47,7 +49,7 @@ const AUTH_ENDPOINTS = [
 export async function login(email: string, password: string): Promise<number> {
   try {
     // PHP 로그인 요청
-    const res = await phpAuth.post<PhpApiResult<LoginResponseDtoType>>('/api/web/auth/login', {
+    const res = await phpAuth.post<PhpApiResult<LoginResponseDtoType>>(AUTH_ENDPOINTS.LOGIN, {
       email,
       password
     })
@@ -55,9 +57,10 @@ export async function login(email: string, password: string): Promise<number> {
     // 디버깅: 응답 구조 확인 (필요시 주석 처리)
     // console.log('로그인 응답:', res)
 
-    if (res.data.success && res.data.data) {
+    if (HTTP_STATUS_RANGE.isSuccess(res.status) && res.data.data) {
       // PHP API 응답 구조 확인
       const responseData: LoginResponseDtoType = res.data.data
+
 
       // PHP API 응답 구조: jwtTokenRes.accessToken
       const accessToken = responseData.jwtTokenRes?.accessToken
@@ -104,9 +107,9 @@ export async function login(email: string, password: string): Promise<number> {
 export async function logout() {
   try {
     // PHP 로그아웃 요청 (CSRF 비활성화 버전)
-    const res = await phpAuth.post<PhpApiResult<null>>('/api/authentication/web/logout', null)
+    const res = await phpAuth.post<PhpApiResult<null>>(AUTH_ENDPOINTS.LOGOUT, null)
 
-    if (res.data.success) {
+    if (HTTP_STATUS_RANGE.isSuccess(res.status)) {
       console.log('로그아웃되었습니다.')
     } else {
       console.error('로그아웃 실패:', res.data.message, 'code:', res.data.code)
@@ -124,6 +127,26 @@ export async function logout() {
     redirect('/login')
   }
 }
+
+// refresh token 갱신 함수 (PHP API 사용)
+export async function refresh(): Promise<number> {
+  try {
+    const res = await phpAuth.post<PhpApiResult<TokenResponseDto>>(AUTH_ENDPOINTS.REFRESH, null)
+
+    if (res.status === HTTP_STATUS.OK && res.data.data) {
+      const newAccessToken = res.data.data.accessToken
+      useAccessTokenStore.getState().setAccessToken(newAccessToken)
+      return res.status
+    } else {
+      console.error('Refresh 실패:', res.data.message, 'code:', res.data.code)
+      return res.data.code || res.status || API_ERROR_CODES.INTERNAL_ERROR
+    }
+  } catch (e: any) {
+    console.error('PHP refresh 네트워크 오류:', e)
+    return API_ERROR_CODES.NETWORK_ERROR
+  }
+}
+
 
 // 헤더에 access token 추가
 auth.interceptors.request.use(config => {
@@ -177,6 +200,17 @@ auth.interceptors.request.use(config => {
 phpAuth.interceptors.request.use(config => {
   const accessToken = useAccessTokenStore.getState().accessToken
 
+  const isRefreshEndpoint = config.url?.includes(AUTH_ENDPOINTS.REFRESH)
+  console.log('isRefreshEndpoint', isRefreshEndpoint);
+
+  if (isRefreshEndpoint) {
+    // refresh 엔드포인트는 Authorization 헤더를 제거
+    if (config.headers) {
+      delete config.headers.Authorization
+    }
+    return config
+  }
+
   // Authorization 헤더 필수 (AccessToken이 있으면)
   if (accessToken) {
     config.headers = config.headers ?? {}
@@ -186,12 +220,16 @@ phpAuth.interceptors.request.use(config => {
   return config
 })
 
+// PHP API용 인터셉터 (refresh token 처리)
+// login, logout, refresh 엔드포인트는 그대로 에러 반환
+// 401 Unauthorized → refresh 1회 호출
+
 phpAuth.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config
 
-    const isAuthEndpoint = AUTH_ENDPOINTS.some(endpoint => originalRequest.url?.includes(endpoint))
+    const isAuthEndpoint = Object.values(AUTH_ENDPOINTS).some(endpoint => originalRequest.url?.includes(endpoint))
 
     if (isAuthEndpoint) {
       // 로그인/로그아웃/refresh 엔드포인트는 그대로 에러 반환
@@ -199,13 +237,13 @@ phpAuth.interceptors.response.use(
     }
 
     // 401 Unauthorized → refresh 1회 호출
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === HTTP_STATUS.UNAUTHORIZED && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {
-        const res = await phpAuth.post<PhpApiResult<TokenResponseDto>>('/api/authentication/web/refresh', null)
+        const res = await phpAuth.post<PhpApiResult<TokenResponseDto>>(AUTH_ENDPOINTS.REFRESH, null)
 
-        if (res.data.success && res.data.data) {
+        if (res.status === HTTP_STATUS.OK && res.data.data) {
           const newAccessToken = res.data.data.accessToken
           useAccessTokenStore.getState().setAccessToken(newAccessToken)
 
