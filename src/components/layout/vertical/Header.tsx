@@ -39,7 +39,7 @@ export default function Header() {
     >
       <Toolbar className='flex justify-between'>
         <div className='flex gap-2'>
-          <div onClick={() => router.push('/machine')} className='cursor-pointer'>
+          <div onClick={() => router.push('/safety')} className='cursor-pointer'>
             {/* <Logo /> */}
             <Typography color='white' variant='h4' sx={{ paddingInlineStart: 4 }}>
               엘림 주식회사
