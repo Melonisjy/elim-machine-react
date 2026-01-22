@@ -25,7 +25,7 @@ export interface PhpApiResult<T = unknown> {
 
 // PHP API용 axios 인스턴스
 export const phpAuth = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_PHP_API_URL}`,
+  baseURL: "/api",
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -35,9 +35,9 @@ export const phpAuth = axios.create({
 
 // Constants 
 const AUTH_ENDPOINTS = {
-  LOGIN: '/api/web/auth/login',
-  LOGOUT: '/api/web/auth/logout',
-  REFRESH: '/api/web/auth/refresh'
+  LOGIN: '/web/auth/login',
+  LOGOUT: '/web/auth/logout',
+  REFRESH: '/web/auth/refresh'
 } as const
 
 /**
@@ -53,6 +53,7 @@ export async function login(email: string, password: string): Promise<number> {
       email,
       password
     })
+
 
     // 디버깅: 응답 구조 확인 (필요시 주석 처리)
     // console.log('로그인 응답:', res)
@@ -133,9 +134,10 @@ export async function refresh(): Promise<number> {
   try {
     const res = await phpAuth.post<PhpApiResult<TokenResponseDto>>(AUTH_ENDPOINTS.REFRESH, null)
 
-    if (res.status === HTTP_STATUS.OK && res.data.data) {
+    if (res.data.success && res.data.data) {
       const newAccessToken = res.data.data.accessToken
       useAccessTokenStore.getState().setAccessToken(newAccessToken)
+
       return res.status
     } else {
       console.error('Refresh 실패:', res.data.message, 'code:', res.data.code)
