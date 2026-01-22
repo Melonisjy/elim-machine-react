@@ -6,6 +6,14 @@ const withPWA = require('next-pwa')({
 })
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://192.168.0.136/workspace_refactoring/api/:path*",
+      }
+    ]
+  },
   basePath: process.env.BASEPATH,
 
   // redirects: async () => {
