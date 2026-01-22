@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import type { UserPrivacyDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
-import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
+import { useMutateSingleUser } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
 import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
@@ -19,7 +19,7 @@ interface PrivacyTabContentProps {
 
 const PrivacyTabContent = forwardRef<refType, PrivacyTabContentProps>(({ defaultData }, ref) => {
   const userId = useContext(UserIdContext)
-  const { mutateAsync: mutatePrivacyAsync } = useMutateSingleMember<UserPrivacyDtoType>(
+  const { mutateAsync: mutatePrivacyAsync } = useMutateSingleUser<UserPrivacyDtoType>(
     userId.toString(),
     'privacy'
   )

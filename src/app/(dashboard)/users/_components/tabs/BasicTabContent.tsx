@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import type { UserBasicDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
-import { useGetLicenseFilter, useGetLicenseNames, useMutateSingleMember } from '@core/hooks/customTanstackQueries'
+import { useGetLicenseFilter, useMutateSingleUser } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
 import { useSavedTabsContext, UserIdContext, type refType } from '../UserModal'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
@@ -25,7 +25,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const { currentUser, setCurrentUserName } = useCurrentUserStore()
 
-  const { mutateAsync: mutateBasicAsync } = useMutateSingleMember<UserBasicDtoType>(userId.toString(), 'basic')
+  const { mutateAsync: mutateBasicAsync } = useMutateSingleUser<UserBasicDtoType>(userId.toString(), 'basic')
   const { data: licenseFilter } = useGetLicenseFilter()
   const licenseNameOption = licenseFilter?.map(v => ({ value: v.englishName, label: v.name }))
 
@@ -46,7 +46,13 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const handleSave = form.handleSubmit(async data => {
     try {
-      const newBasic = await mutateBasicAsync(data)
+      const selectedLicense = licenseFilter?.find(l => l.englishName === data.licenseName)
+
+      const requestData = {
+        ...data,
+        licenseSeq: selectedLicense?.licenseSeq,
+      }
+      const newBasic = await mutateBasicAsync(requestData as unknown as UserBasicDtoType)
 
       form.reset({
         ...newBasic,
@@ -57,8 +63,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
         remark: newBasic.remark ?? ''
       })
 
-      // 헤더에서 사용하는 정보 업데이트 (현재 로그인 중인 사용자의 정보라면)
-      if (currentUser && currentUser.userId) {
+      if (currentUser && currentUser.userId === userId) {
         setCurrentUserName(newBasic.name)
       }
 

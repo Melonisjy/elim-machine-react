@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import type { UserEtcDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
-import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
+import { useMutateSingleUser } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
 import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
@@ -20,7 +20,7 @@ const EtcTabContent = forwardRef<refType, EtcTabContentProps>(({ defaultData }, 
 
   const userId = useContext(UserIdContext)
 
-  const { mutateAsync: mutateEtcAsync } = useMutateSingleMember<UserEtcDtoType>(userId.toString(), 'etc')
+  const { mutateAsync: mutateEtcAsync } = useMutateSingleUser<UserEtcDtoType>(userId.toString(), 'etc')
 
   const form = useForm<UserEtcDtoType>({
     defaultValues: {

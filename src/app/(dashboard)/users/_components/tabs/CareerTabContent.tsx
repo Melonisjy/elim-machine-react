@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 
 import type { UserCareerDtoType } from '@core/types'
 import { MEMBER_INPUT_INFO } from '@/@core/data/input/memberInputInfo'
-import { useMutateSingleMember } from '@core/hooks/customTanstackQueries'
+import { useMutateSingleUser } from '@core/hooks/customTanstackQueries'
 import { handleApiError } from '@core/utils/errorHandler'
 import { UserIdContext, useSavedTabsContext, type refType } from '../UserModal'
 import TextInputBox from '@/@core/components/elim-inputbox/TextInputBox'
@@ -21,7 +21,7 @@ const CareerTabContent = forwardRef<refType, CareerTabContentProps>(({ defaultDa
 
   const savedTabs = useSavedTabsContext()
 
-  const { mutateAsync: mutateCareerAsync } = useMutateSingleMember<UserCareerDtoType>(userId.toString(), 'career')
+  const { mutateAsync: mutateCareerAsync } = useMutateSingleUser<UserCareerDtoType>(userId.toString(), 'career')
 
   const form = useForm<UserCareerDtoType>({
     defaultValues: {
@@ -71,7 +71,7 @@ const CareerTabContent = forwardRef<refType, CareerTabContentProps>(({ defaultDa
     handleDontSave: dontSave,
     dirty: form.formState.isDirty
   }))
-  
+
   const { preJoinExperienceMonth, ...careerInfo } = MEMBER_INPUT_INFO.career
   const labelMap = {
     ...careerInfo,
