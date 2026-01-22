@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // MUI Imports
 import Button from '@mui/material/Button'
@@ -13,10 +13,10 @@ import { useForm } from 'react-hook-form'
 import classNames from 'classnames'
 
 import DefaultModal from '@/@core/components/elim-modal/DefaultModal'
-import type { MemberCreateRequestDtoType } from '@core/types'
+import type { UserCreateRequestDtoType } from '@core/types'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
-import { useGetLicenseNames } from '@core/hooks/customTanstackQueries'
+import { useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import styles from '@core/styles/customTable.module.css'
 import TextFieldTd from '@/@core/components/elim-inputbox/TextFieldTd'
 import SelectTd from '@/@core/components/elim-inputbox/SelectTd'
@@ -31,14 +31,14 @@ type AddUserModalProps = {
 const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) => {
   const [loading, setLoading] = useState(false)
 
-  const { data: licenses } = useGetLicenseNames()
-  const companyNameOption = licenses?.map(v => ({ label: v.licenseName, value: v.licenseName }))
+  const { data: licenseFilter } = useGetLicenseFilter()
+  const licenseNameOption = licenseFilter?.map(v => ({ value: v.englishName, label: v.name }))
 
-  const form = useForm<MemberCreateRequestDtoType>({
+  const form = useForm<UserCreateRequestDtoType>({
     defaultValues: {
-      companyName: '',
+      licenseName: '',
       name: '',
-      memberStatus: '',
+      userStatus: '',
       email: '',
       note: ''
     }
@@ -47,7 +47,7 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
   const onSubmitHandler = form.handleSubmit(async data => {
     try {
       setLoading(true)
-      const response = await auth.post<{ data: MemberCreateRequestDtoType }>(`/api/members`, data)
+      const response = await auth.post<{ data: UserCreateRequestDtoType }>(`/api/members`, data)
 
       console.log('new member added', response.data.data.name)
       handleSuccess('새 직원이 추가되었습니다.')
@@ -95,11 +95,11 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
             </tr>
             <tr>
               <th>소속</th>
-              <SelectTd form={form} name='companyName' option={companyNameOption!} />
+              <SelectTd form={form} name='licenseName' option={licenseNameOption!} />
             </tr>
             <tr>
               <th>재직상태</th>
-              <SelectTd form={form} name='memberStatus' option={userStatusOption} />
+              <SelectTd form={form} name='userStatus' option={userStatusOption} />
             </tr>
           </tbody>
         </table>
