@@ -128,11 +128,21 @@ export interface CalendarEventResponseDtoType {
 // -------- 직원관리 --------
 // POST api/members (필수: role)
 export interface MemberCreateRequestDtoType {
-  companyName: string
+  licenseName: string
   name: string
 
   // role: string
   memberStatus: string
+  email: string
+  note: string
+}
+
+export interface UserCreateRequestDtoType {
+  licenseName: string
+  name: string
+
+  // role: string
+  userStatus: string
   email: string
   note: string
 }
