@@ -138,12 +138,10 @@ export interface MemberCreateRequestDtoType {
 }
 
 export interface UserCreateRequestDtoType {
-  licenseName: string
   name: string
-
-  // role: string
-  userStatus: string
+  licenseSeq: number
   email: string
+  userStatus: string
   note: string
 }
 
