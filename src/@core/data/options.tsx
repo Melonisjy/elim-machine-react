@@ -63,8 +63,7 @@ export const roleOption = [
 export const userStatusOption: OptionType<userStatusType> = [
   { value: 'NORMAL', label: '재직중' },
   { value: 'QUIT', label: '퇴사' },
-  { value: 'PENDING', label: '가입 승인대기' },
-  { value: 'LEAVE', label: '휴직' }
+  { value: 'PENDING', label: '승인대기' },
 ]
 
 export const nationalityOption = [
