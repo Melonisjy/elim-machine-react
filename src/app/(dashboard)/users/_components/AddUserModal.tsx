@@ -15,12 +15,12 @@ import classNames from 'classnames'
 import DefaultModal from '@/@core/components/elim-modal/DefaultModal'
 import type { UserCreateRequestDtoType } from '@core/types'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
+import { phpAuth } from '@core/utils/auth'
 import { useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import styles from '@core/styles/customTable.module.css'
 import TextFieldTd from '@/@core/components/elim-inputbox/TextFieldTd'
 import SelectTd from '@/@core/components/elim-inputbox/SelectTd'
 import { userStatusOption } from '@/@core/data/options'
-import { phpAuth } from '@/@core/utils/auth'
 
 type AddUserModalProps = {
   open: boolean
@@ -32,26 +32,25 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
   const [loading, setLoading] = useState(false)
 
   const { data: licenseFilter } = useGetLicenseFilter()
-  const licenseNameOption = licenseFilter?.map(v => ({ value: v.englishName, label: v.name }))
+  const licenseNameOption = licenseFilter?.map(v => ({ value: v.licenseSeq, label: v.name }))
 
   const form = useForm<UserCreateRequestDtoType>({
     defaultValues: {
-      licenseName: '',
+      licenseSeq: 0,
       name: '',
-      userStatus: '',
+      status: '',
       email: '',
-      note: ''
+      remark: '',
     }
   })
 
   const onSubmitHandler = form.handleSubmit(async data => {
     try {
       setLoading(true)
-      const response = await phpAuth.post<{ data: UserCreateRequestDtoType }>(`/api/members`, data)
+      await phpAuth.post<{ data: UserCreateRequestDtoType }>(`/web/user`, data)
 
-      console.log('new member added', response.data.data.name)
+
       handleSuccess('새 직원이 추가되었습니다.')
-
       handlePageChange()
       setOpen(false)
     } catch (error: any) {
@@ -87,25 +86,41 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
           <tbody>
             <tr className={styles.required}>
               <th>이름</th>
-              <TextFieldTd form={form} name='name' placeholder='이름은 필수입력입니다' />
+              <TextFieldTd form={form} name='name' placeholder='홍길동' rules={{ required: '이름을 입력해주세요' }} />
             </tr>
             <tr className={styles.required}>
               <th>이메일</th>
-              <TextFieldTd form={form} name='email' placeholder='이메일은 필수입력입니다' />
+              <TextFieldTd form={form} name='email' placeholder='example@elimsafety.com' rules={{
+                required: '이메일을 입력해주세요', pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: '이메일 형식이 올바르지 않습니다'
+                }
+              }} />
             </tr>
-            <tr>
+            <tr className={styles.required}>
               <th>소속</th>
-              <SelectTd form={form} name='licenseName' option={licenseNameOption!} />
+              <SelectTd
+                form={form}
+                name='licenseSeq'
+                placeholder='예: 엘림주식회사'
+                option={licenseNameOption!}
+                rules={{
+                  required: "소속을 선택해주세요",
+                  validate: (value) => value !== 0 && value !== '' && value !== undefined || "소속을 선택해주세요."
+                }}
+              />
             </tr>
-            <tr>
+            <tr className={styles.required}>
               <th>재직상태</th>
-              <SelectTd form={form} name='userStatus' option={userStatusOption} />
+              <SelectTd form={form} name='status' placeholder='재직상태 선택' option={userStatusOption} rules={{
+                required: "재직상태를 선택해주세요",
+              }} />
             </tr>
           </tbody>
         </table>
         <div>
           <Typography>비고</Typography>
-          <TextField fullWidth multiline rows={3} {...form.register('note')} />
+          <TextField fullWidth multiline rows={3} {...form.register('remark')} />
         </div>
       </div>
     </DefaultModal>
