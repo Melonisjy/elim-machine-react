@@ -15,7 +15,7 @@ import { IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
 
 import { useQueryClient } from '@tanstack/react-query'
 
-import { Alert, Typography, Chip, Box } from '@mui/material'
+import { Chip, Box } from '@mui/material'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -398,11 +398,6 @@ export default function UsersPage() {
             </Button>
           </div>
         </div>
-        <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
-          <Typography variant="body2">
-            행을 우클릭하거나 선택삭제 버튼을 사용하여 직원을 삭제할 수 있습니다.
-          </Typography>
-        </Alert>
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
           <BasicTable<UserDtoType>
