@@ -141,8 +141,8 @@ export interface UserCreateRequestDtoType {
   name: string
   licenseSeq: number
   email: string
-  userStatus: string
-  note: string
+  status: string
+  remark: string
 }
 
 // GET api/members (리스트)
