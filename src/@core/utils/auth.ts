@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 
 import axios from 'axios'
 
-import type { LoginResponseDtoType, TokenResponseDto } from '@core/types'
+import type { LoginResponseDtoType, MeReponseDtoType, TokenResponseDto } from '@core/types'
 import useAccessTokenStore from '@/@core/hooks/zustand/useAuthStore'
 import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 
@@ -37,7 +37,8 @@ export const phpAuth = axios.create({
 const AUTH_ENDPOINTS = {
   LOGIN: '/web/auth/login',
   LOGOUT: '/web/auth/logout',
-  REFRESH: '/web/auth/refresh'
+  REFRESH: '/web/auth/refresh',
+  ME: '/web/auth/me'
 } as const
 
 /**
@@ -62,7 +63,6 @@ export async function login(email: string, password: string): Promise<number> {
       // PHP API 응답 구조 확인
       const responseData: LoginResponseDtoType = res.data.data
 
-
       // PHP API 응답 구조: jwtTokenRes.accessToken
       const accessToken = responseData.jwtTokenRes?.accessToken
 
@@ -76,7 +76,8 @@ export async function login(email: string, password: string): Promise<number> {
       // 사용자 정보는 data에 직접 있음 (userSeq, email, name, roles, status)
       const UserInfo = {
         userId: responseData.userSeq,
-        name: responseData.name
+        name: responseData.name,
+        role: responseData.roles[0]
       }
 
       useCurrentUserStore.getState().setCurrentUser(UserInfo)
@@ -138,6 +139,24 @@ export async function refresh(): Promise<number> {
       const newAccessToken = res.data.data.accessToken
       useAccessTokenStore.getState().setAccessToken(newAccessToken)
 
+      const userInfo = useCurrentUserStore.getState().currentUser
+
+      if (!userInfo) {
+        try {
+          const meResponse = await phpAuth.get<PhpApiResult<MeReponseDtoType>>(AUTH_ENDPOINTS.ME)
+
+          if (meResponse.data.success && meResponse.data.data) {
+            useCurrentUserStore.getState().setCurrentUser({
+              userId: meResponse.data.data.userSeq,
+              name: meResponse.data.data.name,
+              role: meResponse.data.data.roles[0]
+            })
+          }
+        } catch (e: any) {
+          console.error('PHP me 네트워크 오류:', e)
+        }
+      }
+
       return res.status
     } else {
       console.error('Refresh 실패:', res.data.message, 'code:', res.data.code)
@@ -151,18 +170,18 @@ export async function refresh(): Promise<number> {
 
 
 // 헤더에 access token 추가
-auth.interceptors.request.use(config => {
-  const accessToken = useAccessTokenStore.getState().accessToken
+// auth.interceptors.request.use(config => {
+//   const accessToken = useAccessTokenStore.getState().accessToken
 
-  if (accessToken) {
-    config.headers = config.headers ?? {}
-    config.headers.Authorization = `Bearer ${accessToken}`
-  } else {
-    console.log('no access token')
-  }
+//   if (accessToken) {
+//     config.headers = config.headers ?? {}
+//     config.headers.Authorization = `Bearer ${accessToken}`
+//   } else {
+//     console.log('no access token')
+//   }
 
-  return config
-})
+//   return config
+// })
 
 // 기계설비용 Java 백엔드 인터셉터 (java 백엔드 사용안할 시 주석)
 // auth.interceptors.response.use(
