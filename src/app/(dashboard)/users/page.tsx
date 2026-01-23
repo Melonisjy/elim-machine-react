@@ -68,7 +68,7 @@ export default function UsersPage() {
 
 
   // 선택삭제 기능 관련
-  const [showCheckBox, setShowCheckBox] = useState(false)
+  // const [showCheckBox, setShowCheckBox] = useState(false)
   const [checked, setChecked] = useState<{ userId: number }[]>([])
 
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅해주는 함수
@@ -266,7 +266,7 @@ export default function UsersPage() {
 
       adjustPage(-1 * checked.length)
       removeQueryCaches()
-      setShowCheckBox(false)
+      // setShowCheckBox(false)
       setChecked([])
       handleSuccess(`선택된 직원 ${checked.length}명이 삭제되었습니다.`)
     } catch (error) {
@@ -365,7 +365,7 @@ export default function UsersPage() {
 
           <div className='flex sm:flex-row max-sm:is-full items-start sm:items-center gap-2 sm:gap-4'>
             {/* 한번에 삭제 */}
-            {!showCheckBox ? (
+            {/* {!showCheckBox ? (
               <Button disabled={disabled} variant='contained' onClick={() => setShowCheckBox(prev => !prev)}>
                 선택삭제
               </Button>
@@ -385,7 +385,7 @@ export default function UsersPage() {
                   취소
                 </Button>
               </div>
-            )}
+            )} */}
 
             {/* 유저 추가 버튼 */}
             <Button
@@ -406,7 +406,7 @@ export default function UsersPage() {
             handleRowClick={handleUserClick}
             loading={isLoading}
             error={isError}
-            showCheckBox={showCheckBox}
+            // showCheckBox={showCheckBox}
             isChecked={isChecked}
             handleCheckItem={handleCheckUser}
             handleCheckAllItems={handleCheckAllUsers}
