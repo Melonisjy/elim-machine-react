@@ -426,7 +426,7 @@ export default function UsersPage() {
           open={addUserModalOpen}
           setOpen={setAddUserModalOpen}
           handlePageChange={() => {
-            adjustPage(1)
+            setQueryParams({ page: 0 })
             removeQueryCaches()
           }}
         />
