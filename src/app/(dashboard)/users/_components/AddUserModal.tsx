@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 // MUI Imports
 import Button from '@mui/material/Button'
@@ -15,12 +15,12 @@ import classNames from 'classnames'
 import DefaultModal from '@/@core/components/elim-modal/DefaultModal'
 import type { UserCreateRequestDtoType } from '@core/types'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
-import { auth } from '@core/utils/auth'
 import { useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import styles from '@core/styles/customTable.module.css'
 import TextFieldTd from '@/@core/components/elim-inputbox/TextFieldTd'
 import SelectTd from '@/@core/components/elim-inputbox/SelectTd'
 import { userStatusOption } from '@/@core/data/options'
+import { phpAuth } from '@/@core/utils/auth'
 
 type AddUserModalProps = {
   open: boolean
@@ -47,7 +47,7 @@ const AddUserModal = ({ open, setOpen, handlePageChange }: AddUserModalProps) =>
   const onSubmitHandler = form.handleSubmit(async data => {
     try {
       setLoading(true)
-      const response = await auth.post<{ data: UserCreateRequestDtoType }>(`/api/members`, data)
+      const response = await phpAuth.post<{ data: UserCreateRequestDtoType }>(`/api/members`, data)
 
       console.log('new member added', response.data.data.name)
       handleSuccess('새 직원이 추가되었습니다.')

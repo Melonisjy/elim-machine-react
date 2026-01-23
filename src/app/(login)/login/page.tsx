@@ -62,11 +62,10 @@ export default function LoginPage() {
       const userName = userInfo?.name
 
       if (isTablet) {
-        router.push('/check')
-
+        router.push('/safety')
         printSuccessSnackbar(`환영합니다${userName ? `,\n${userName}님` : ''}`)
       } else {
-        router.push('/')
+        router.push('/safety')
         handleSuccess(`환영합니다${userName ? `,\n${userName}님` : ''}`)
       }
     } else {

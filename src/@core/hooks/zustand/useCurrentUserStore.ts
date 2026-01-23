@@ -7,7 +7,8 @@ import { persist } from 'zustand/middleware'
 
 type UserInfoType = {
   userId: number
-  name: string
+  name?: string
+  role: string
 } | null
 
 interface CurrentUserState {
@@ -18,7 +19,7 @@ interface CurrentUserState {
 
 const CurrentUserCreator: StateCreator<CurrentUserState> = set => ({
   // ⭐ 초기 상태 (State)
-  currentUser: { userId: 0, name: '' },
+  currentUser: { userId: 0, name: '', role: '' },
 
   // ⭐ 액션 (Action)
   setCurrentUserName: (value: string) => {

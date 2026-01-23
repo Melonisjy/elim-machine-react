@@ -1710,6 +1710,13 @@ export interface LoginResponseDtoType {
   pwResetRequired?: boolean
 }
 
+// /me
+export interface MeReponseDtoType {
+  userSeq: number
+  roles: string[]
+  name: string
+}
+
 
 // JWT 토큰 발급 DTO
 export interface TokenResponseDto {

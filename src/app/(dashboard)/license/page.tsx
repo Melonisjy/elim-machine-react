@@ -272,7 +272,7 @@ export default function Licensepage() {
         </div>
         <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
           <Typography variant="body2">
-            행을 우클릭하거나 선택삭제 버튼을 사용하여 직원을 삭제할 수 있습니다.
+            행을 우클릭하거나 선택삭제 버튼을 클릭하여 라이선스를 삭제할 수 있습니다.
           </Typography>
         </Alert>
         {/* 테이블 */}

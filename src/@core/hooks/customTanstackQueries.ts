@@ -2336,70 +2336,70 @@ const createDetailQueryHook = <T>(
   }
 }
 
-// GET /api/web/audit/login-logs
+// GET /web/audit/login-logs
 export const useGetLoginLogs = createQueryHook<PhpApiResponseDtoType<LoginLogDtoType>>(
-  '/api/web/audit/login-logs',
+  '/web/audit/login-logs',
   QUERY_KEYS.LOGIN_LOG.GET_LOGIN_LOGS,
   '로그인 기록 조회 실패'
 )
 
-// GET /api/web/audit/users
+// GET /web/audit/users
 export const useGetUsers = createQueryHook<UserResponseDtoType>(
-  '/api/web/audit/users',
+  '/web/audit/users',
   QUERY_KEYS.USER.GET_USERS,
   '직원 조회 실패'
 )
 
-// GET /api/web/user/{userId}/basic
+// GET /web/user/{userId}/basic
 export const useGetUserBasic = createDetailQueryHook<UserBasicDtoType>(
-  userId => `/api/web/user/${userId}/basic`,
+  userId => `/web/user/${userId}/basic`,
   QUERY_KEYS.USER.GET_USER_BASIC,
   '기본정보 조회 실패'
 )
 
-// GET /api/web/user/{userId}/privacy
+// GET /web/user/{userId}/privacy
 export const useGetUserPrivacy = createDetailQueryHook<UserPrivacyDtoType>(
-  userId => `/api/web/user/${userId}/privacy`,
+  userId => `/web/user/${userId}/privacy`,
   QUERY_KEYS.USER.GET_USER_PRIVACY,
   '개인정보 조회 실패'
 )
 
-// GET /api/web/user/{userId}/office
+// GET /web/user/{userId}/office
 export const useGetUserOffice = createDetailQueryHook<UserOfficeDtoType>(
-  userId => `/api/web/user/${userId}/office`,
+  userId => `/web/user/${userId}/office`,
   QUERY_KEYS.USER.GET_USER_OFFICE,
   '재직정보 조회 실패'
 )
 
-// GET /api/web/user/{userId}/career
+// GET /web/user/{userId}/career
 export const useGetUserCareer = createDetailQueryHook<UserCareerDtoType>(
-  userId => `/api/web/user/${userId}/career`,
+  userId => `/web/user/${userId}/career`,
   QUERY_KEYS.USER.GET_USER_CAREER,
   '경력정보 조회 실패'
 )
 
-// GET /api/web/user/{userId}/etc
+// GET /web/user/{userId}/etc
 export const useGetUserEtc = createDetailQueryHook<UserEtcDtoType>(
-  userId => `/api/web/user/${userId}/etc`,
+  userId => `/web/user/${userId}/etc`,
   QUERY_KEYS.USER.GET_USER_ETC,
   '기타정보 조회 실패'
 )
 
-// GET /api/web/audit/licenses
+// GET /web/audit/licenses
 export const useGetLicenses = createQueryHook<PhpApiResponseDtoType<LicensePageResponseDtoType>>(
-  `/api/web/audit/licenses`,
+  `/web/audit/licenses`,
   QUERY_KEYS.LICENSE.GET_LICENSES,
   '라이선스 조회 실패'
 )
 
-// GET /api/web/users/licenseFilter
+// GET /web/users/licenseFilter
 export const useGetLicenseFilter = () => {
   return useQuery({
     queryKey: ['GET_LICENSE_FILTER'],
     queryFn: async () => {
       const response = await phpAuth
         .get<PhpApiResult<{ items: { licenseSeq: number; name: string; englishName: string }[] }>>(
-          '/api/web/users/licenseFilter'
+          '/web/users/licenseFilter'
         )
         .then(v => {
           if (v.data.success && v.data.data) {
@@ -2437,7 +2437,7 @@ export const useMutateSingleUser = <T>(userId: string, userType: UserType) => {
     }
 
     const response = await phpAuth
-      .put<PhpApiResult<T>>(`/api/web/user/${userId}${requestInfo.url}`, data)
+      .put<PhpApiResult<T>>(`/web/user/${userId}${requestInfo.url}`, data)
 
 
     if (response.data?.success === false) {
