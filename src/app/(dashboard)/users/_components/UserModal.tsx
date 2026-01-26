@@ -5,8 +5,9 @@ import type { RefObject } from 'react'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 // MUI Imports
-
 import Button from '@mui/material/Button'
+import Skeleton from '@mui/material/Skeleton'
+import Box from '@mui/material/Box'
 
 // Component Imports
 import Tab from '@mui/material/Tab'
@@ -175,11 +176,18 @@ const UserModal = ({ open, setOpen, userId, onDelete, reloadPages }: EditUserInf
     return () => clearInterval(interval)
   }, [getIsDirty])
 
-  // 로그인한 사용자의 userModal인지 파악
-  const currentuserId = useCurrentUserStore(set => set.currentUser)?.userId
-  const isYours = userId === currentuserId
-
-
+  const FormSkeleton = () => (
+    <DialogContent className='overflow-visible pbs-0 sm:pli-16'>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {[1, 2, 3, 4, 5, 6].map((_, index) => (
+          <Box key={index} sx={{ display: 'flex', gap: 3 }}>
+            <Skeleton variant='rectangular' height={56} sx={{ flex: 1, borderRadius: 1 }} />
+            <Skeleton variant='rectangular' height={56} sx={{ flex: 1, borderRadius: 1 }} />
+          </Box>
+        ))}
+      </Box>
+    </DialogContent>
+  )
 
   // else 문 추가 필요
   const handleDeleteUser = async () => {
@@ -323,35 +331,35 @@ const UserModal = ({ open, setOpen, userId, onDelete, reloadPages }: EditUserInf
                 <div className='flex-1 overflow-y-auto pt-5'>
                   <TabPanel value='1' keepMounted>
                     {isLoadingBasic ? (
-                      <div>로딩 중...</div>
+                      <FormSkeleton />
                     ) : (
                       basicData && <BasicTabContent ref={basicTabRef} defaultData={basicData} />
                     )}
                   </TabPanel>
                   <TabPanel value='2' keepMounted>
                     {isLoadingPrivacy ? (
-                      <div>로딩 중...</div>
+                      <FormSkeleton />
                     ) : (
                       privacyData && <PrivacyTabContent ref={privacyTabRef} defaultData={privacyData} />
                     )}
                   </TabPanel>
                   <TabPanel value='3' keepMounted>
                     {isLoadingOffice ? (
-                      <div>로딩 중...</div>
+                      <FormSkeleton />
                     ) : (
                       officeData && <OfficeTabContent ref={officeTabRef} defaultData={officeData} />
                     )}
                   </TabPanel>
                   <TabPanel value='4' keepMounted>
                     {isLoadingCareer ? (
-                      <div>로딩 중...</div>
+                      <FormSkeleton />
                     ) : (
                       careerData && <CareerTabContent ref={careerTabRef} defaultData={careerData} />
                     )}
                   </TabPanel>
                   <TabPanel value='5' keepMounted>
                     {isLoadingEtc ? (
-                      <div>로딩 중...</div>
+                      <FormSkeleton />
                     ) : (
                       etcData && <EtcTabContent ref={etcTabRef} defaultData={etcData} />
                     )}
