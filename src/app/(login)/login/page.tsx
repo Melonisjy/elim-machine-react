@@ -29,6 +29,7 @@ import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { printErrorSnackbar, printSuccessSnackbar } from '@core/utils/snackbarHandler'
 import { getErrorMessageByCode, getDefaultMessageByStatus } from '@/@core/constants/apiErrorCodes'
+import { useGetLicenseFilter } from '@/@core/hooks/customTanstackQueries'
 
 type LoginFormInputs = {
   email: string
@@ -45,6 +46,8 @@ export default function LoginPage() {
   const theme = useTheme()
   const isTablet = useMediaQuery(theme.breakpoints.down('md'))
 
+  const { data: licenseFilter } = useGetLicenseFilter()
+
   const {
     register,
     handleSubmit,
@@ -60,6 +63,17 @@ export default function LoginPage() {
     if (response >= 200 && response < 300) {
       const userInfo = useCurrentUserStore.getState().currentUser
       const userName = userInfo?.name
+      const licenseSeq = userInfo?.licenseSeq
+
+      const license = licenseFilter?.find(license => license.licenseSeq === licenseSeq)
+      const licenseName = license?.name || license?.englishName || ''
+
+      if (licenseName && userInfo) {
+        useCurrentUserStore.getState().setCurrentUser({
+          ...userInfo,
+          licenseName
+        })
+      }
 
       if (isTablet) {
         router.push('/safety')
