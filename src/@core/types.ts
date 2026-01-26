@@ -1705,6 +1705,7 @@ export interface LoginResponseDtoType {
   email: string
   status: string
   roles: string[]
+  licenseSeq: number
   pwResetRequired?: boolean
 }
 
