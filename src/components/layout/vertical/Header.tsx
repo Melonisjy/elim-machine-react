@@ -16,8 +16,9 @@ import useCurrentUserStore from '@/@core/hooks/zustand/useCurrentUserStore'
 export default function Header() {
   const router = useRouter()
   const [openUser, setOpenUser] = useState(false)
-
   const currentUser = useCurrentUserStore(set => set.currentUser)
+
+  const licenseName = currentUser?.licenseName || ''
 
   function UserModalContainer() {
     const { data: userData } = useGetSingleMember((currentUser?.userId ?? 0).toString())
@@ -42,7 +43,7 @@ export default function Header() {
           <div onClick={() => router.push('/safety')} className='cursor-pointer'>
             {/* <Logo /> */}
             <Typography color='white' variant='h4' sx={{ paddingInlineStart: 4 }}>
-              엘림 주식회사
+              {licenseName}
             </Typography>
           </div>
         </div>
