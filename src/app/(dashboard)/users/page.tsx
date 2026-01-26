@@ -325,44 +325,16 @@ export default function UsersPage() {
           </Box>
         )}
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-3 sm:p-6 border-bs gap-2 sm:gap-4'>
-          <div className='flex gap-2'>
-            {/* 페이지당 행수 */}
-            <CustomTextField
-              size='small'
-              select
-              value={size.toString()}
-              onChange={e => {
-                setQueryParams({ size: e.target.value, page: 0 })
-              }}
-              className='gap-[5px]'
-              disabled={disabled}
-              slotProps={{
-                select: {
-                  renderValue: selectedValue => {
-                    return selectedValue + ' 개씩'
-                  }
-                }
-              }}
-            >
-              {PageSizeOptions.map(pageSize => (
-                <MenuItem key={pageSize} value={pageSize}>
-                  {pageSize}
-                  {`\u00a0\u00a0`}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-            {/* 이름으로 검색 */}
-            <SearchBar
-              key={`name_${name}`}
-              defaultValue={name ?? ''}
-              placeholder='이름으로 검색'
-              setSearchKeyword={name => {
-                setQueryParams({ name: name, page: 0 })
-              }}
-              disabled={disabled}
-            />
-          </div>
-
+          {/* 이름으로 검색 */}
+          <SearchBar
+            key={`name_${name}`}
+            defaultValue={name ?? ''}
+            placeholder='이름으로 검색'
+            setSearchKeyword={name => {
+              setQueryParams({ name: name, page: 0 })
+            }}
+            disabled={disabled}
+          />
           <div className='flex sm:flex-row max-sm:is-full items-start sm:items-center gap-2 sm:gap-4'>
             {/* 유저 추가 버튼 */}
             <Button
