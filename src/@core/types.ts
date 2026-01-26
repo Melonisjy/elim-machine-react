@@ -210,6 +210,7 @@ export type PermissionKey =
 
 export interface UserBasicDtoType {
   licenseName: string
+  licenseSeq?: number
   name: string
   role: string
   status: string
