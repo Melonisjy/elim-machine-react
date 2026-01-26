@@ -364,29 +364,6 @@ export default function UsersPage() {
           </div>
 
           <div className='flex sm:flex-row max-sm:is-full items-start sm:items-center gap-2 sm:gap-4'>
-            {/* 한번에 삭제 */}
-            {/* {!showCheckBox ? (
-              <Button disabled={disabled} variant='contained' onClick={() => setShowCheckBox(prev => !prev)}>
-                선택삭제
-              </Button>
-            ) : (
-              <div className='flex gap-1'>
-                <Button variant='contained' color='error' onClick={handleDeleteUsers}>
-                  {`(${checked.length}) 삭제`}
-                </Button>
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  onClick={() => {
-                    setShowCheckBox(prev => !prev)
-                    handleCheckAllUsers(false)
-                  }}
-                >
-                  취소
-                </Button>
-              </div>
-            )} */}
-
             {/* 유저 추가 버튼 */}
             <Button
               variant='contained'
@@ -394,7 +371,7 @@ export default function UsersPage() {
               onClick={() => setAddUserModalOpen(!addUserModalOpen)}
               disabled={disabled}
             >
-              추가
+              직원 추가
             </Button>
           </div>
         </div>
