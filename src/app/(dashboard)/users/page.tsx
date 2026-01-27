@@ -259,7 +259,7 @@ export default function UsersPage() {
     if (!checked.length) return
 
     try {
-      await auth.delete(`/api/web/audit/users`, {
+      await auth.delete(`/api/web/users`, {
         //@ts-ignore
         data: { memberDeleteRequestDtos: checked }
       })
@@ -277,7 +277,7 @@ export default function UsersPage() {
   const handleDeleteUser = useCallback(
     async (user: UserDtoType) => {
       try {
-        await auth.delete(`/api/web/audit/users/${user.userSeq}`, {
+        await auth.delete(`/api/web/users/${user.userSeq}`, {
           //@ts-ignore
           data: { userId: user.userSeq }
         })
