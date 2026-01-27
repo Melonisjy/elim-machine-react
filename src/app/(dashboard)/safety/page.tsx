@@ -103,7 +103,7 @@ export default function SafetyPage() {
       },
       companyName: {
         ...SAFETY_PROJECT_FILTER_INFO.companyName,
-        options: licenseNames?.map(l => ({ value: l.id.toString(), label: l.companyName }))
+        options: licenseNames?.map(l => ({ value: l.id.toString(), label: l.licenseName }))
       }
     }),
     [engineers, licenseNames]
@@ -273,31 +273,6 @@ export default function SafetyPage() {
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <div className='flex gap-8 items-center'>
             <div className='flex gap-2 flex-wrap'>
-              {/* 페이지당 행수 */}
-              <CustomTextField
-                size='small'
-                select
-                value={size.toString()}
-                onChange={e => {
-                  setQueryParams({ size: Number(e.target.value), page: 0 })
-                }}
-                className='gap-[5px]'
-                disabled={disabled}
-                slotProps={{
-                  select: {
-                    renderValue: selectedValue => {
-                      return selectedValue + ' 개씩'
-                    }
-                  }
-                }}
-              >
-                {PageSizeOptions.map(pageSize => (
-                  <MenuItem key={pageSize} value={pageSize}>
-                    {pageSize}
-                    {`\u00a0\u00a0`}
-                  </MenuItem>
-                ))}
-              </CustomTextField>
               {/* 건물명으로 검색 */}
               <SearchBar
                 key={`projectName_${buildingName}`}
@@ -415,9 +390,11 @@ export default function SafetyPage() {
         <BasicTablePagination totalCount={totalCount} disabled={disabled} />
       </Card>
       {/* 생성 모달 */}
-      {addModalOpen && (
-        <AddSafetyProjectModal open={addModalOpen} setOpen={setAddModalOpen} reloadPage={handlePageWhenPlusOne} />
-      )}
-    </LocalizationProvider>
+      {
+        addModalOpen && (
+          <AddSafetyProjectModal open={addModalOpen} setOpen={setAddModalOpen} reloadPage={handlePageWhenPlusOne} />
+        )
+      }
+    </LocalizationProvider >
   )
 }
