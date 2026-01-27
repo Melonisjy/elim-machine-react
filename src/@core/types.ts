@@ -164,7 +164,7 @@ export type MemberPageDtoType = {
   genderDescription: string
 }
 
-// GET /api/web/audit/users (유저리스트 조회)
+// GET /api/web/users (유저리스트 조회)
 export type UserDtoType = {
   no: number,
   userSeq: number,
@@ -1201,7 +1201,7 @@ export interface MachineProjectPicUpdateRequestDtoType {
 // }
 
 // php
-// GET /api/web/audit/licenses
+// GET /api/web/licenses
 export interface LicensePageResponseDtoType {
   num: number
   licenseSeq: number
