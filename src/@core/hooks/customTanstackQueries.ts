@@ -2336,16 +2336,16 @@ const createDetailQueryHook = <T>(
   }
 }
 
-// GET /web/audit/login-logs
+// GET /web/login-logs
 export const useGetLoginLogs = createQueryHook<PhpApiResponseDtoType<LoginLogDtoType>>(
-  '/web/audit/login-logs',
+  '/web/login-logs',
   QUERY_KEYS.LOGIN_LOG.GET_LOGIN_LOGS,
   '로그인 기록 조회 실패'
 )
 
-// GET /web/audit/users
+// GET /web/users
 export const useGetUsers = createQueryHook<UserResponseDtoType>(
-  '/web/audit/users',
+  '/web/users',
   QUERY_KEYS.USER.GET_USERS,
   '직원 조회 실패'
 )
@@ -2385,9 +2385,9 @@ export const useGetUserEtc = createDetailQueryHook<UserEtcDtoType>(
   '기타정보 조회 실패'
 )
 
-// GET /web/audit/licenses
+// GET /web/licenses
 export const useGetLicenses = createQueryHook<PhpApiResponseDtoType<LicensePageResponseDtoType>>(
-  `/web/audit/licenses`,
+  `/web/licenses`,
   QUERY_KEYS.LICENSE.GET_LICENSES,
   '라이선스 조회 실패'
 )
