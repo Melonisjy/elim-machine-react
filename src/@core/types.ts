@@ -1206,7 +1206,6 @@ export interface LicensePageResponseDtoType {
   num: number
   licenseSeq: number
   name: string
-  englishName: string
   region: string
   bizno: string
   ceoName: string

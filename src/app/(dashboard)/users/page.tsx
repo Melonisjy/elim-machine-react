@@ -110,7 +110,7 @@ export default function UsersPage() {
 
             // licenseName인 경우 동적 데이터에서 찾기
             if (filterKey === 'licenseName') {
-              const license = licenseFilter?.find(l => l.englishName === value)
+              const license = licenseFilter?.find(l => String(l.licenseSeq) === value)
               displayValue = license?.name ?? value
             } else {
               const option = filterInfo.options?.find(opt => String(opt.value) === value)
