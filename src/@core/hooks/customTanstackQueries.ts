@@ -2399,7 +2399,7 @@ export const useGetLicenseFilter = () => {
     queryFn: async () => {
       const response = await phpAuth
         .get<PhpApiResult<{ items: { licenseSeq: number; name: string; englishName: string }[] }>>(
-          '/web/users/licenseFilter'
+          '/web/licenseFilter'
         )
         .then(v => {
           if (v.data.success && v.data.data) {
