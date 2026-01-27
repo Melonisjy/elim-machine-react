@@ -77,7 +77,8 @@ export async function login(email: string, password: string): Promise<number> {
       const UserInfo = {
         userId: responseData.userSeq,
         name: responseData.name,
-        role: responseData.roles[0]
+        role: responseData.roles[0],
+        licenseSeq: responseData.licenseSeq
       }
 
       useCurrentUserStore.getState().setCurrentUser(UserInfo)
@@ -149,7 +150,7 @@ export async function refresh(): Promise<number> {
             useCurrentUserStore.getState().setCurrentUser({
               userId: meResponse.data.data.userSeq,
               name: meResponse.data.data.name,
-              role: meResponse.data.data.roles[0]
+              role: meResponse.data.data.roles[0],
             })
           }
         } catch (e: any) {

@@ -35,17 +35,21 @@ export const YNOption: OptionType<ynResultType> = [
 export const mapLabelToValue = (options: { label: string, value: string }[], inputValue?: string): string => {
   if (!inputValue) return ''
 
-  const foundByLabel = options.find(opt => opt.label === inputValue)
+  const normalizedInput = inputValue.trim()
+
+  const foundByLabel = options.find(opt => opt.label === normalizedInput || opt.label.trim() === normalizedInput)
   if (foundByLabel) return foundByLabel.value
 
   const foundByValue = options.find(
-    opt => opt.value.toUpperCase() === inputValue.toUpperCase()
+    opt => opt.value.toUpperCase() === normalizedInput.toUpperCase() ||
+      opt.value.toUpperCase() === normalizedInput.trim().toUpperCase()
   )
 
-  if (foundByValue) return foundByValue.label
+  if (foundByValue) return foundByValue.value
 
   return inputValue
 }
+
 
 // member
 // 해당 옵션은 실제로 사용되지 않음. InputBox에서 실제 라이선스 리스트를 가져와서 사용하기 때문.

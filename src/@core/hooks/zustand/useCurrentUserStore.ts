@@ -9,6 +9,8 @@ type UserInfoType = {
   userId: number
   name?: string
   role: string
+  licenseSeq?: number
+  licenseName?: string
 } | null
 
 interface CurrentUserState {
@@ -19,7 +21,7 @@ interface CurrentUserState {
 
 const CurrentUserCreator: StateCreator<CurrentUserState> = set => ({
   // ⭐ 초기 상태 (State)
-  currentUser: { userId: 0, name: '', role: '' },
+  currentUser: { userId: 0, name: '', role: '', licenseSeq: 0, licenseName: '' },
 
   // ⭐ 액션 (Action)
   setCurrentUserName: (value: string) => {

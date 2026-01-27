@@ -144,6 +144,7 @@ function InputBoxContent() {
         />
       )
     case 'multi':
+      const hasValue = value && value !== ''
       return (
         <CustomTextField
           id={tabFieldKey}
@@ -154,11 +155,33 @@ function InputBoxContent() {
           value={value ?? ''}
           onChange={e => onChange(e.target.value)}
           required={showLabel && required}
+          sx={{
+            '& .MuiInputBase-root': {
+              ...(hasValue && {
+                borderColor: 'primary.main',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                },
+              }),
+            },
+          }}
           slotProps={{
-            select: { displayEmpty: true }
+            select: {
+              displayEmpty: true,
+              renderValue: (selected) => {
+                if (!selected || selected === '') {
+                  return <span style={{ color: '#999' }}>{placeholder || tabField?.label || '전체'}</span>
+                }
+                const selectedValue = selected as string
+                const option = (tabFieldKey === 'licenseName' ? companyNameOption : tabField?.options)?.find(
+                  opt => opt.value === selectedValue
+                )
+                return option?.label || selectedValue || ''
+              }
+            }
           }}
         >
-          <MenuItem value=''>전체</MenuItem>
+          <MenuItem value=''>{placeholder || tabField?.label || '전체'}</MenuItem>
           {(tabFieldKey === 'licenseName' ? companyNameOption : tabField?.options)?.map(option => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}

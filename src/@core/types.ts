@@ -210,6 +210,7 @@ export type PermissionKey =
 
 export interface UserBasicDtoType {
   licenseName: string
+  licenseSeq?: number
   name: string
   role: string
   status: string
@@ -1705,6 +1706,7 @@ export interface LoginResponseDtoType {
   email: string
   status: string
   roles: string[]
+  licenseSeq: number
   pwResetRequired?: boolean
 }
 

@@ -45,6 +45,8 @@ export default function BasicTableFilter<T>({ filterInfo, disabled, padding = 6 
           disabled={disabled}
           value={searchParams.get(property) ?? ''}
           onChange={value => setSearchParam(property, value)}
+          placeholder={filterInfo[property as keyof T]?.label}
+          showLabel={false}
         />
       ))}
     </Grid>
