@@ -31,7 +31,7 @@ export default function AddSafetyProjectModal({ open, setOpen, reloadPage }: Add
   const [loading, setLoading] = useState(false)
 
   const { data: licenseList } = useGetLicenseNames()
-  const companyNameOption = licenseList?.map(v => ({ label: v.companyName, value: v.companyName }))
+  const companyNameOption = licenseList?.map(v => ({ label: v.licenseName, value: v.licenseName }))
 
   const form = useForm<
     Omit<SafetyProjectCreateRequestDtoType, 'safetyInspectionType'> & {
