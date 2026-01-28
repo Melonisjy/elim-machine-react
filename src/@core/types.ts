@@ -39,7 +39,7 @@ export interface tableHeaderInfoType {
   member: HeaderType<MemberPageDtoType>
   user: HeaderType<UserDtoType>
   machineProject: HeaderType<MachineProjectPageDtoType>
-  safetyProject: HeaderType<SafetyProjectPageResponseDtoType>
+  safetyProject: HeaderType<SafetyProjectDtoType>
   machineInspection: HeaderType<MachineInspectionPageResponseDtoType>
   engineers: HeaderType<MachineEngineerPageResponseDtoType>
   licenses: HeaderType<LicensePageResponseDtoType>
@@ -567,7 +567,7 @@ export type MachineProjectScheduleUpdateResponseDtoType = MachineProjectSchedule
 
 // ----------- 안전진단현장 (Safety Project) -----------
 // GET /api/safety/projects
-export interface SafetyProjectPageResponseDtoType {
+export interface SafetyProjectDtoType {
   num: number
   status: string
   checkType: string
@@ -579,8 +579,15 @@ export interface SafetyProjectPageResponseDtoType {
   facilityType: string
   jong: string
   licenseName: string
-  engineerName: string
-  grossArea: number
+  engineers: string[]
+  grossArea: number | string
+}
+
+export interface SafetyProjectPageResponseDtoType {
+  items: SafetyProjectDtoType[]
+  total: number
+  page: number
+  size: number
 }
 
 // 안전진단현장 필터
