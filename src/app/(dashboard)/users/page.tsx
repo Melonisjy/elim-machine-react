@@ -8,7 +8,6 @@ import { useSearchParams } from 'next/navigation'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 
 // Component Imports
 import { IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
@@ -17,7 +16,6 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { Chip, Box } from '@mui/material'
 
-import CustomTextField from '@core/components/mui/TextField'
 
 // Style Imports
 import UserModal from './_components/UserModal'
