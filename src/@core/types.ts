@@ -595,6 +595,7 @@ export interface SafetyProjectFilterType {
   projectStatus: projectStatusType
   companyName: string
   engineerName: string
+  region: string
 }
 
 // POST api/safety/projects
