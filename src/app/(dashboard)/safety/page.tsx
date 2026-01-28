@@ -8,7 +8,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 
 // Component Imports
 import 'dayjs/locale/ko'
@@ -24,9 +23,8 @@ import { Backdrop, CircularProgress, Typography } from '@mui/material'
 
 import { useQueryClient } from '@tanstack/react-query'
 
-import CustomTextField from '@core/components/mui/TextField'
 
-import type { SafetyProjectFilterType, SafetyProjectPageResponseDtoType } from '@core/types'
+import type { SafetyProjectDtoType, SafetyProjectFilterType, SafetyProjectPageResponseDtoType } from '@core/types'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import SearchBar from '@core/components/elim-inputbox/SearchBar'
 import BasicTable from '@core/components/elim-table/BasicTable'
@@ -42,6 +40,7 @@ import useSetQueryParams from '@/@core/hooks/searchParams/useSetQueryParams'
 import BasicTablePagination from '@core/components/elim-table/BasicTablePagination'
 import { SAFETY_PROJECT_FILTER_INFO } from '@/@core/data/filter/safetyProjectFilterInfo'
 import useSafetyProjectTabValueStore from '@/@core/hooks/zustand/useSafetyProjectTabValueStore'
+import { formatNumber } from '@/utils/number'
 
 // datepicker 한글화
 dayjs.locale('ko')
@@ -59,7 +58,7 @@ export default function SafetyPage() {
 
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
-  const buildingName = searchParams.get('buildingName')
+  const placeName = searchParams.get('placeName')
   const region = searchParams.get('region')
   const fieldBeginDate = searchParams.get('fieldBeginDate')
   const fieldEndDate = searchParams.get('fieldEndDate')
@@ -77,7 +76,18 @@ export default function SafetyPage() {
     isError
   } = useGetSafetyProjects(searchParams.toString())
 
-  const safetyProjects = safetyProjectsPages?.content
+  const safetyProjectsRaw = safetyProjectsPages?.items ?? []
+
+  const safetyProjects: SafetyProjectDtoType[] = safetyProjectsRaw.map(p => ({
+    ...p,
+    engineers: Array.isArray(p.engineers) ? p.engineers : [],
+    grossArea:
+      typeof p.grossArea === 'number'
+        ? formatNumber(p.grossArea)
+        : p.grossArea ?? '',
+  }))
+
+
 
   const {
     data: engineers,
@@ -92,7 +102,7 @@ export default function SafetyPage() {
   const total_loading = loading || isLoadingPages || isLoadingEngineerList || isLoadingLicenseNames
   const disabled = total_loading || isError || isErrorEngineerList || isErrorLicenseNames
 
-  const totalCount = safetyProjectsPages?.page.totalElements ?? 0
+  const totalCount = safetyProjectsPages?.total ?? 0
 
   const EXTENDED_SAFETY_PROJECT_FILTER_INFO = useMemo(
     () => ({
@@ -112,14 +122,14 @@ export default function SafetyPage() {
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅까지 해주는 함수
   const updateParams = useUpdateParams()
 
-  type paramType = 'page' | 'size' | 'buildingName' | 'region' | 'fieldBeginDate' | 'fieldEndDate'
+  type paramType = 'page' | 'size' | 'placeName' | 'region' | 'fieldBeginDate' | 'fieldEndDate'
 
   const setQueryParams = useSetQueryParams<paramType>()
 
   const resetQueryParams = useCallback(() => {
     updateParams(params => {
       params.delete('page')
-      params.delete('buildingName')
+      params.delete('placeName')
       params.delete('region')
       params.delete('fieldBeginDate')
       params.delete('fieldEndDate')
@@ -179,12 +189,12 @@ export default function SafetyPage() {
   }, [setQueryParams, removeQueryCaches])
 
   // 기계설비현장 선택 핸들러
-  const handleSafetyProjectClick = async (safetyProject: SafetyProjectPageResponseDtoType) => {
-    if (!safetyProject?.safetyProjectId) return
+  const handleSafetyProjectClick = async (safetyProject: SafetyProjectDtoType) => {
+    if (!safetyProject?.num) return
 
     try {
       setTabValue('현장정보')
-      router.push(`/safety/${safetyProject.safetyProjectId}`)
+      router.push(`/safety/${safetyProject.num}`)
     } catch (error) {
       handleApiError(error, '프로젝트 정보를 불러오는 데 실패했습니다.')
     }
@@ -206,13 +216,13 @@ export default function SafetyPage() {
     setCurMonth(month)
   }
 
-  const handleDeleteRow = async (row: SafetyProjectPageResponseDtoType) => {
+  const handleDeleteRow = async (row: SafetyProjectDtoType) => {
     try {
       setLoading(true)
-      await auth.delete(`/api/safety/projects/${row.safetyProjectId}?version=${row.version}`)
+      await auth.delete(`/api/safety/projects/${row.num}`)
       adjustPage(-1)
       removeQueryCaches()
-      handleSuccess(`${row.buildingName}이(가) 삭제되었습니다`)
+      handleSuccess(`${row.placeName}이(가) 삭제되었습니다`)
     } catch (e) {
       handleApiError(e)
     } finally {
@@ -220,12 +230,12 @@ export default function SafetyPage() {
     }
   }
 
-  const handleCopyRow = async (row: SafetyProjectPageResponseDtoType) => {
+  const handleCopyRow = async (row: SafetyProjectDtoType) => {
     try {
       setLoading(true)
-      await auth.post(`/api/safety/projects/${row.safetyProjectId}/clone`)
+      await auth.post(`/api/safety/projects/${row.num}/clone`)
       handlePageWhenPlusOne()
-      handleSuccess(`${row.buildingName}이(가) 복사되었습니다`)
+      handleSuccess(`${row.placeName}이(가) 복사되었습니다`)
     } catch (e) {
       handleApiError(e)
     } finally {
@@ -275,11 +285,11 @@ export default function SafetyPage() {
             <div className='flex gap-2 flex-wrap'>
               {/* 건물명으로 검색 */}
               <SearchBar
-                key={`projectName_${buildingName}`}
+                key={`projectName_${placeName}`}
                 placeholder='건물명으로 검색'
-                defaultValue={buildingName ?? ''}
+                defaultValue={placeName ?? ''}
                 setSearchKeyword={keyword => {
-                  setQueryParams({ buildingName: keyword, page: 0 })
+                  setQueryParams({ placeName: keyword, page: 0 })
                 }}
                 disabled={disabled}
               />
@@ -367,15 +377,15 @@ export default function SafetyPage() {
         </Typography>
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
-          <BasicTable<SafetyProjectPageResponseDtoType>
+          <BasicTable<SafetyProjectDtoType>
             header={TABLE_HEADER_INFO.safetyProject}
             data={safetyProjects}
             handleRowClick={handleSafetyProjectClick}
             loading={isLoadingPages}
             error={isError}
-            listException={['engineerNames']}
+            listException={['engineers']}
             rightClickMenuHeader={contextMenu => {
-              return contextMenu.row['buildingName']
+              return contextMenu.row['placeName']
             }}
             rightClickMenu={[
               { icon: <IconCopyPlusFilled size={20} color='gray' />, label: '복사', handleClick: handleCopyRow },
