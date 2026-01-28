@@ -87,7 +87,10 @@ export default function UsersPage() {
 
       const filterKeys = Object.keys(MEMBER_FILTER_INFO)
 
-      filterKeys.forEach(v => params.delete(v))
+      filterKeys.forEach(v => {
+        const paramKey = v === 'licenseName' ? 'licenseSeq' : v
+        params.delete(paramKey)
+      })
     })
   }, [updateParams])
 
@@ -148,7 +151,8 @@ export default function UsersPage() {
   const removeFilter = useCallback(
     (filterKey: string, filterValue: string) => {
       updateParams(params => {
-        const currentValue = params.get(filterKey)
+        const paramKey = filterKey === 'licenseName' ? 'licenseSeq' : filterKey
+        const currentValue = params.get(paramKey)
 
         if (!currentValue) return
 
@@ -165,13 +169,13 @@ export default function UsersPage() {
         if (filterInfo?.type === 'multi') {
           const values = currentValue.split(',').filter(v => v !== filterValue)
           if (values.length > 0) {
-            params.set(filterKey, values.join(','))
+            params.set(paramKey, values.join(','))
           } else {
-            params.delete(filterKey)
+            params.delete(paramKey)
           }
         } else {
           // single 타입인 경우 전체 제거
-          params.delete(filterKey)
+          params.delete(paramKey)
         }
 
         // 필터 변경 시 페이지를 0으로 리셋
