@@ -97,7 +97,9 @@ export default function UsersPage() {
     const activeFilters: Array<{ key: string; label: string; value: string; displayValue: string }> = []
 
     Object.keys(MEMBER_FILTER_INFO).forEach(filterKey => {
-      const filterValue = params.get(filterKey)
+      // licenseName인 경우 실제로는 licenseSeq 키로 저장되어 있음
+      const paramKey = filterKey === 'licenseName' ? 'licenseSeq' : filterKey
+      const filterValue = params.get(paramKey)
       if (filterValue && filterValue !== '') {
         const filterInfo = MEMBER_FILTER_INFO[filterKey as keyof MemberFilterType]
         const filterLabel = filterInfo.label
