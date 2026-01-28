@@ -27,7 +27,7 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const { mutateAsync: mutateBasicAsync } = useMutateSingleUser<UserBasicDtoType>(userId.toString(), 'basic')
   const { data: licenseFilter } = useGetLicenseFilter()
-  const licenseNameOption = licenseFilter?.map(v => ({ value: v.englishName, label: v.name }))
+  const licenseNameOption = licenseFilter?.map(v => ({ value: v.name, label: v.name }))
 
   const form = useForm<UserBasicDtoType>({
     defaultValues: {
@@ -35,7 +35,6 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
       name: defaultData.name ?? '',
       email: defaultData.email ?? '',
       licenseName: defaultData.licenseName ?? '',
-      licenseSeq: defaultData.licenseSeq ?? 0,
       status: mapLabelToValue(userStatusOption, defaultData.status),
       remark: defaultData.remark ?? ''
     }
@@ -47,17 +46,8 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
 
   const handleSave = form.handleSubmit(async data => {
     try {
-      // licenseName이 한글이면 영문으로 변환
-      const normalizedLicenseName = licenseNameOption
-        ? mapLabelToValue(licenseNameOption, data.licenseName)
-        : data.licenseName
-
-      const selectedLicense = licenseFilter?.find(l => l.englishName === normalizedLicenseName)
-
       const requestData = {
         ...data,
-        licenseName: normalizedLicenseName,
-        licenseSeq: selectedLicense?.licenseSeq,
       }
       const newBasic = await mutateBasicAsync(requestData as unknown as UserBasicDtoType)
 
@@ -68,7 +58,6 @@ const BasicTabContent = forwardRef<refType, BasicTabContentProps>(({ defaultData
         licenseName: licenseNameOption
           ? mapLabelToValue(licenseNameOption, newBasic.licenseName)
           : newBasic.licenseName,
-        licenseSeq: newBasic.licenseSeq ?? 0,
         status: mapLabelToValue(userStatusOption, newBasic.status),
         remark: newBasic.remark ?? ''
       })

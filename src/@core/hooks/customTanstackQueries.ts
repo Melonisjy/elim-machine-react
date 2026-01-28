@@ -969,31 +969,6 @@ export const useGetMachineProjects = (queryParams: string) => {
 }
 
 // ------------------------- Safety Project 관련 -------------------------
-// GET /api/machine-projects
-export const useGetSafetyProjects = (queryParams: string) => {
-  return useQuery({
-    queryKey: QUERY_KEYS.SAFETY_PROJECT.GET_SAFETY_PROJECTS(queryParams),
-    queryFn: async data => {
-      const [keyType, queryParams] = data.queryKey
-      const params = new URLSearchParams(queryParams)
-
-      if (!params.has('size')) {
-        params.set('size', '15')
-      }
-
-      const response = await auth
-        .get<{
-          data: successResponseDtoType<SafetyProjectPageResponseDtoType[]>
-        }>(`/api/safety/projects?${params}`)
-        .then(v => v.data.data)
-
-      console.log(`!!! queryFn ${keyType}:`)
-
-      return response
-    }
-  })
-}
-
 // GET /api/machine-projects/{machineProjectId}/
 export const useGetSafetyProject = (safetyProjectId: string) => {
   const fetchSafetyProjectData: QueryFunction<SafetyProjectReadResponseDtoType, string[]> = useCallback(
@@ -2392,13 +2367,19 @@ export const useGetLicenses = createQueryHook<PhpApiResponseDtoType<LicensePageR
   '라이선스 조회 실패'
 )
 
+export const useGetSafetyProjects = createQueryHook<SafetyProjectPageResponseDtoType>(
+  '/web/safety',
+  QUERY_KEYS.SAFETY_PROJECT.GET_SAFETY_PROJECTS,
+  '안전진단현장 조회 실패'
+)
+
 // GET /web/users/licenseFilter
 export const useGetLicenseFilter = () => {
   return useQuery({
     queryKey: ['GET_LICENSE_FILTER'],
     queryFn: async () => {
       const response = await phpAuth
-        .get<PhpApiResult<{ items: { licenseSeq: number; name: string; englishName: string }[] }>>(
+        .get<PhpApiResult<{ items: { licenseSeq: number; name: string; }[] }>>(
           '/web/licenseFilter'
         )
         .then(v => {

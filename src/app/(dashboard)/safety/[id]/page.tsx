@@ -38,6 +38,7 @@ import SafetyProjectTabContent from './_components/tabs/SafetyProjectTabContent'
 import NoteTabContent from './_components/tabs/NoteTabContent'
 import ScheduleAndEngineerTabContent from './_components/tabs/ScheduleAndEngineerTabContent'
 import SafetyInspectionFormTabContent from './_components/tabs/SafetyInspectionFormTabContent'
+import DrawingListTabContent from './_components/tabs/DrawingListTabContent'
 
 const Tabs: { value: SafetyProjectTabValueType; label: SafetyProjectTabValueType }[] = [
   { value: '현장정보', label: '현장정보' },
@@ -159,13 +160,9 @@ const SafetyProjectPage = () => {
               <TabPanel value='현장점검표' className='h-full'>
                 <SafetyInspectionFormTabContent />
               </TabPanel>
-              {/*
-              <TabPanel value='설비목록' className='h-full'>
-                <InspectionListTabContent />
+              <TabPanel value='도면목록' className='h-full'>
+                <DrawingListTabContent />
               </TabPanel>
-              <TabPanel value='전체사진' className='h-full'>
-                <PictureListTabContent />
-              </TabPanel>*/}
               <TabPanel value='특이사항'>
                 {safetyProjectData ? <NoteTabContent /> : <Typography>특이사항 정보를 불러오는 중입니다.</Typography>}
               </TabPanel>

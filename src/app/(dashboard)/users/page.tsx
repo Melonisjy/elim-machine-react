@@ -8,7 +8,6 @@ import { useSearchParams } from 'next/navigation'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 
 // Component Imports
 import { IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
@@ -17,7 +16,6 @@ import { useQueryClient } from '@tanstack/react-query'
 
 import { Chip, Box } from '@mui/material'
 
-import CustomTextField from '@core/components/mui/TextField'
 
 // Style Imports
 import UserModal from './_components/UserModal'
@@ -87,7 +85,10 @@ export default function UsersPage() {
 
       const filterKeys = Object.keys(MEMBER_FILTER_INFO)
 
-      filterKeys.forEach(v => params.delete(v))
+      filterKeys.forEach(v => {
+        const paramKey = v === 'licenseName' ? 'licenseSeq' : v
+        params.delete(paramKey)
+      })
     })
   }, [updateParams])
 
@@ -97,7 +98,9 @@ export default function UsersPage() {
     const activeFilters: Array<{ key: string; label: string; value: string; displayValue: string }> = []
 
     Object.keys(MEMBER_FILTER_INFO).forEach(filterKey => {
-      const filterValue = params.get(filterKey)
+      // licenseName인 경우 실제로는 licenseSeq 키로 저장되어 있음
+      const paramKey = filterKey === 'licenseName' ? 'licenseSeq' : filterKey
+      const filterValue = params.get(paramKey)
       if (filterValue && filterValue !== '') {
         const filterInfo = MEMBER_FILTER_INFO[filterKey as keyof MemberFilterType]
         const filterLabel = filterInfo.label
@@ -110,7 +113,7 @@ export default function UsersPage() {
 
             // licenseName인 경우 동적 데이터에서 찾기
             if (filterKey === 'licenseName') {
-              const license = licenseFilter?.find(l => l.englishName === value)
+              const license = licenseFilter?.find(l => String(l.licenseSeq) === value)
               displayValue = license?.name ?? value
             } else {
               const option = filterInfo.options?.find(opt => String(opt.value) === value)
@@ -146,7 +149,8 @@ export default function UsersPage() {
   const removeFilter = useCallback(
     (filterKey: string, filterValue: string) => {
       updateParams(params => {
-        const currentValue = params.get(filterKey)
+        const paramKey = filterKey === 'licenseName' ? 'licenseSeq' : filterKey
+        const currentValue = params.get(paramKey)
 
         if (!currentValue) return
 
@@ -163,13 +167,13 @@ export default function UsersPage() {
         if (filterInfo?.type === 'multi') {
           const values = currentValue.split(',').filter(v => v !== filterValue)
           if (values.length > 0) {
-            params.set(filterKey, values.join(','))
+            params.set(paramKey, values.join(','))
           } else {
-            params.delete(filterKey)
+            params.delete(paramKey)
           }
         } else {
           // single 타입인 경우 전체 제거
-          params.delete(filterKey)
+          params.delete(paramKey)
         }
 
         // 필터 변경 시 페이지를 0으로 리셋

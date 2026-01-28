@@ -63,7 +63,7 @@ interface BasicTableProps<T> {
  *
  * @returns prop으로 받은 테이블 정보로 테이블 생성
  */
-export default function BasicTable<T extends Record<keyof T, string | number | string[]>>({
+export default function BasicTable<T>({
   header,
   data,
   rightClickMenuHeader,
@@ -341,13 +341,14 @@ export default function BasicTable<T extends Record<keyof T, string | number | s
                       const list = info[k] as string[]
 
                       // 세 개 이상일 경우 외 (length - 2) 로 처리
-                      cell =
-                        list.length < 3
-                          ? list.join(', ')
-                          : list
-                            .slice(0, 2)
-                            .join(', ')
-                            .concat(` 외 ${list.length - 2}`)
+                      if (list)
+                        cell =
+                          list?.length < 3
+                            ? list.join(', ')
+                            : list
+                              .slice(0, 2)
+                              .join(', ')
+                              .concat(` 외 ${list.length - 2}`)
                     }
 
                     // 3. Exception이 아닌 경우

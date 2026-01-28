@@ -66,7 +66,7 @@ export default function LoginPage() {
       const licenseSeq = userInfo?.licenseSeq
 
       const license = licenseFilter?.find(license => license.licenseSeq === licenseSeq)
-      const licenseName = license?.name || license?.englishName || ''
+      const licenseName = license?.name || ''
 
       if (licenseName && userInfo) {
         useCurrentUserStore.getState().setCurrentUser({
