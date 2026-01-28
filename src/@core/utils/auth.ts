@@ -137,6 +137,8 @@ export async function refresh(): Promise<number> {
     const res = await phpAuth.post<PhpApiResult<TokenResponseDto>>(AUTH_ENDPOINTS.REFRESH, null)
 
     if (res.data.success && res.data.data) {
+      // refresh 성공 로그
+      console.log('refresh 성공 응답: ', res.data);
       const newAccessToken = res.data.data.accessToken
       useAccessTokenStore.getState().setAccessToken(newAccessToken)
 
