@@ -93,7 +93,7 @@ export default function SafetyPage() {
     data: engineers,
   } = useGetEngineersOptions('SAFETY')
 
-  const { data: licenseNames, isLoading: isLoadingLicenseNames, isError: isErrorLicenseNames } = useGetLicenseNames()
+  const { data: licenseNames } = useGetLicenseNames()
 
   const [loading, setLoading] = useState(false)
 
@@ -288,16 +288,6 @@ export default function SafetyPage() {
                 defaultValue={placeName ?? ''}
                 setSearchKeyword={keyword => {
                   setQueryParams({ placeName: keyword, page: 0 })
-                }}
-                disabled={disabled}
-              />
-              {/* 지역으로 검색 */}
-              <SearchBar
-                key={`region_${region}`}
-                placeholder='지역으로 검색'
-                defaultValue={region ?? ''}
-                setSearchKeyword={region => {
-                  setQueryParams({ region: region, page: 0 })
                 }}
                 disabled={disabled}
               />
