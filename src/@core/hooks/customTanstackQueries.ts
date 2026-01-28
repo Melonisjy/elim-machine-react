@@ -2398,7 +2398,7 @@ export const useGetLicenseFilter = () => {
     queryKey: ['GET_LICENSE_FILTER'],
     queryFn: async () => {
       const response = await phpAuth
-        .get<PhpApiResult<{ items: { licenseSeq: number; name: string; englishName: string }[] }>>(
+        .get<PhpApiResult<{ items: { licenseSeq: number; name: string; }[] }>>(
           '/web/licenseFilter'
         )
         .then(v => {

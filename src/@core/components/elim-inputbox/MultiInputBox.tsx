@@ -65,11 +65,11 @@ export default function MultiInputBox<T extends Record<string, any>>({
                 select: {
                   displayEmpty: true,
                   renderValue: v => {
-                    const normalizedValue = String(v ?? '').toUpperCase()
+                    const stringValue = String(v ?? '').toUpperCase()
 
                     const foundOption = option?.find(p =>
-                      String(p.value ?? '').toUpperCase() === normalizedValue ||
-                      String(p.label ?? '').toUpperCase() === normalizedValue
+                      String(p.value ?? '').toUpperCase() === stringValue.toUpperCase() ||
+                      String(p.label ?? '') === stringValue
                     )
 
                     return foundOption ? (
