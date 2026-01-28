@@ -91,16 +91,14 @@ export default function SafetyPage() {
 
   const {
     data: engineers,
-    isLoading: isLoadingEngineerList,
-    isError: isErrorEngineerList
   } = useGetEngineersOptions('SAFETY')
 
   const { data: licenseNames, isLoading: isLoadingLicenseNames, isError: isErrorLicenseNames } = useGetLicenseNames()
 
   const [loading, setLoading] = useState(false)
 
-  const total_loading = loading || isLoadingPages || isLoadingEngineerList || isLoadingLicenseNames
-  const disabled = total_loading || isError || isErrorEngineerList || isErrorLicenseNames
+  const total_loading = loading || isLoadingPages
+  const disabled = total_loading || isError
 
   const totalCount = safetyProjectsPages?.total ?? 0
 
