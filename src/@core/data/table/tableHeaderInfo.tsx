@@ -46,7 +46,7 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     tel: { label: '전화번호', canSort: false }
   },
   safetyProject: {
-    status: { label: '상태', canSort: true },
+    status: { label: '상태', canSort: false },
     checkType: { label: '종류', canSort: false },
     region: { label: '지역', canSort: false },
     placeName: { label: '건물명', canSort: false },
@@ -56,7 +56,7 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     facilityType: { label: '구분', canSort: false },
     jong: { label: '종별', canSort: false },
     licenseName: { label: '점검업체', canSort: true },
-    engineers: { label: '참여기술진', canSort: true },
+    engineers: { label: '참여기술진', canSort: false },
     grossArea: { label: '연면적(㎡)', canSort: true }
   },
   machineInspection: {
