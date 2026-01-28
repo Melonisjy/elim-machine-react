@@ -568,20 +568,19 @@ export type MachineProjectScheduleUpdateResponseDtoType = MachineProjectSchedule
 // ----------- 안전진단현장 (Safety Project) -----------
 // GET /api/safety/projects
 export interface SafetyProjectPageResponseDtoType {
-  safetyProjectId: number
-  version: number
-  projectStatusDescription: string
-  safetyInspectionTypeDescription: string
+  num: number
+  status: string
+  checkType: string
   region: string
-  buildingName: string
+  placeName: string
   fieldBeginDate: string
   fieldEndDate: string
-  reportDeadline: string
-  facilityClassificationDescription: string
-  facilityClassDescription: string
-  companyName: string
-  grossArea: string
-  engineerNames: string[]
+  reportDate: string
+  facilityType: string
+  jong: string
+  licenseName: string
+  engineerName: string
+  grossArea: number
 }
 
 // 안전진단현장 필터
