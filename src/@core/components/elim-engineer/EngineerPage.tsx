@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, createContext, useContext } from 'react'
+import { useState, useCallback, createContext, useContext, useMemo } from 'react'
 
 // MUI Imports
 import { useSearchParams } from 'next/navigation'
@@ -15,7 +15,7 @@ import { IconBoltOff, IconPlus, IconReload } from '@tabler/icons-react'
 
 import { useQueryClient } from '@tanstack/react-query'
 
-import { Backdrop, CircularProgress, Typography } from '@mui/material'
+import { Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -28,10 +28,13 @@ import { DEFAULT_PAGESIZE, PageSizeOptions } from '@core/data/options'
 import { ENGINEER_FILTER_INFO } from '@core/data/filter/engineerFilterInfo'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
-import { useGetEngineer, useGetMachineEngineers, useGetEngineersOptions, useGetSafetyEngineers } from '@core/hooks/customTanstackQueries'
+
+import { useGetEngineer, useGetMachineEngineers, useGetEngineersOptions, useGetSafetyEngineers, useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useUpdateParams from '@/@core/hooks/searchParams/useUpdateParams'
 import useSetQueryParams from '@/@core/hooks/searchParams/useSetQueryParams'
+import useFilterChips from '@core/hooks/useFilterChips'
+import FilterChipBar from '@core/components/elim-table/FilterChipBar'
 import BasicTablePagination from '@core/components/elim-table/BasicTablePagination'
 import deleteEngineer from '../../utils/deleteEngineer'
 import AddEngineerModal from './AddEngineerModal'
@@ -57,10 +60,37 @@ export function useEngineerTypeContext() {
 export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerType?: engineerTypeType }) {
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
+  const { data: licenseFilter } = useGetLicenseFilter()
+
 
   const engineerTerm = ({ MACHINE: '기계설비 기술자', SAFETY: '안전진단 기술자' } as Record<engineerTypeType, string>)[
     engineerType
   ]
+
+  const EXTENDED_ENGINEER_FILTER_INFO = useMemo(
+    () => ({
+      ...ENGINEER_FILTER_INFO,
+      licenseName: {
+        ...ENGINEER_FILTER_INFO.licenseName,
+        options: licenseFilter?.map(l => ({
+          value: String(l.licenseSeq),
+          label: l.name,
+        })),
+      },
+    }),
+    [licenseFilter],
+  )
+
+  const { activeFilters, removeFilter } = useFilterChips<EngineerFilterType>({
+    filterInfo: EXTENDED_ENGINEER_FILTER_INFO,
+    extraTextFilters: [
+      { key: 'name', label: '이름' },
+      { key: 'projectName', label: '현장명' },
+    ],
+    paramKeyMapper: key =>
+      key === 'licenseName' ? 'licenseSeq' // ✅ 회사 필터는 licenseSeq에 저장됨
+        : key,
+  })
 
   // 데이터 리스트
   const {
@@ -113,6 +143,7 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
 
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅까지 해주는 함수
   const updateParams = useUpdateParams()
+
 
   type paramType = 'page' | 'size' | 'name' | 'projectName'
 
@@ -245,18 +276,13 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
           className='pbe-4'
         />
         {/* 필터바 */}
-        <BasicTableFilter<EngineerFilterType> filterInfo={ENGINEER_FILTER_INFO} disabled={disabled} />
-        {/* 필터 초기화 버튼 */}
-        <Button
-          startIcon={<IconReload />}
-          onClick={() => {
-            resetQueryParams()
-          }}
-          className='max-sm:is-full absolute right-8 top-8'
+        <BasicTableFilter<EngineerFilterType> filterInfo={EXTENDED_ENGINEER_FILTER_INFO} disabled={disabled} />
+        <FilterChipBar
+          activeFilters={activeFilters}
+          removeFilter={removeFilter}
+          onReset={resetQueryParams}
           disabled={disabled}
-        >
-          필터 초기화
-        </Button>
+        />
         <div className=' flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <div className='flex gap-2'>
             {/* 페이지당 행수 */}
@@ -342,9 +368,12 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
             </Button>
           </div>
         </div>
-        <Typography color='warning.main' sx={{ px: 3 }}>
-          {`※우클릭으로 ${engineerTerm}에서 제외할 수 있습니다`}
-        </Typography>
+        <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
+          <Typography variant="body2">
+            {`우클릭으로 ${engineerTerm}에서 제외할 수 있습니다`}
+          </Typography>
+        </Alert>
+
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
           <BasicTable<EngineerRowDtoType>
