@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://192.168.0.136/workspace_refactoring/api/:path*",
+        destination: "http://192.168.0.170/workspace_refactoring/api/:path*",
       }
     ]
   },
