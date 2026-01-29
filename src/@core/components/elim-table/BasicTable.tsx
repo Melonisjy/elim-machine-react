@@ -343,12 +343,12 @@ export default function BasicTable<T>({
                       // 세 개 이상일 경우 외 (length - 2) 로 처리
                       if (list)
                         cell =
-                          list?.length < 3
+                          list.length < 3
                             ? list.join(', ')
                             : list
                               .slice(0, 2)
                               .join(', ')
-                              .concat(` 외 ${list.length - 2}`)
+                              .concat(` 외 ${list.length - 2}${String(k) === 'engineers' ? '명' : ''}`)
                     }
 
                     // 3. Exception이 아닌 경우
