@@ -31,6 +31,7 @@ type DefaultModalProps = {
   secondaryButton?: ReactNode
   modifyButton?: ReactNode
   deleteButton?: ReactNode
+  uploadButton?: ReactNode
   onClose?: () => void
   TransitionProps?: TransitionProps
   sx?: SxProps
@@ -57,6 +58,7 @@ export default function DefaultModal(props: DefaultModalProps) {
     secondaryButton,
     modifyButton,
     deleteButton,
+    uploadButton,
     onClose = () => {
       setOpen(false)
     },
@@ -141,9 +143,10 @@ export default function DefaultModal(props: DefaultModalProps) {
       </DialogContent>
 
       {/* 하단 버튼 */}
-      {(primaryButton || secondaryButton) && (
-        <DialogActions className='justify-center pbs-0 sm:pbe-16 sm:pli-16 mt-[20px] lg:mt-[40px]'>
+      {(primaryButton || secondaryButton || uploadButton) && (
+        <DialogActions className='justify-center pbs-0 sm:pbe-16 sm:pli-16 mt-[20px] lg:mt-[40px]' >
           {primaryButton}
+          {uploadButton}
           {secondaryButton}
         </DialogActions>
       )}
