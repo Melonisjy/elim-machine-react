@@ -85,14 +85,25 @@ export default function SafetyPage() {
 
   const safetyProjectsRaw = safetyProjectsPages?.items ?? []
 
-  const safetyProjects: SafetyProjectDtoType[] = safetyProjectsRaw.map(p => ({
-    ...p,
-    engineers: Array.isArray(p.engineers) ? p.engineers : [],
-    grossArea:
-      typeof p.grossArea === 'number'
-        ? formatNumber(p.grossArea)
-        : p.grossArea ?? '',
-  }))
+  const safetyProjects: SafetyProjectDtoType[] = safetyProjectsRaw.map(p => {
+    const raw =
+      typeof p.engineers === 'string'
+        ? JSON.parse(p.engineers)
+        : p.engineers
+
+    const engineerNames = Array.isArray(raw)
+      ? (raw as { name: string }[]).map(e => e.name)
+      : []
+
+    return {
+      ...p,
+      engineers: engineerNames,
+      grossArea:
+        typeof p.grossArea === 'number'
+          ? formatNumber(p.grossArea)
+          : p.grossArea ?? '',
+    }
+  })
 
 
   const [loading, setLoading] = useState(false)
