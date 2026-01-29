@@ -19,7 +19,7 @@ import dayjs from 'dayjs'
 
 import { IconCopyPlusFilled, IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
 
-import { Backdrop, CircularProgress, Typography } from '@mui/material'
+import { Backdrop, CircularProgress, Typography, Chip, Box } from '@mui/material'
 
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -33,7 +33,7 @@ import { DEFAULT_PAGESIZE, PageSizeOptions } from '@core/data/options'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
-import { useGetEngineersOptions, useGetLicenseNames, useGetSafetyProjects } from '@core/hooks/customTanstackQueries'
+import { useGetEngineersOptions, useGetLicenseNames, useGetSafetyProjects, useGetSafetyEngineerFilter } from '@core/hooks/customTanstackQueries'
 import { QUERY_KEYS } from '@core/data/queryKeys'
 import useUpdateParams from '@/@core/hooks/searchParams/useUpdateParams'
 import useSetQueryParams from '@/@core/hooks/searchParams/useSetQueryParams'
@@ -59,7 +59,6 @@ export default function SafetyPage() {
   const page = Number(searchParams.get('page') ?? 0)
   const size = Number(searchParams.get('size') ?? DEFAULT_PAGESIZE)
   const placeName = searchParams.get('placeName')
-  const region = searchParams.get('region')
   const fieldBeginDate = searchParams.get('fieldBeginDate')
   const fieldEndDate = searchParams.get('fieldEndDate')
 
@@ -68,6 +67,13 @@ export default function SafetyPage() {
   const [curMonth, setCurMonth] = useState<0 | 1 | 3 | 6 | null>(0)
 
   const [addModalOpen, setAddModalOpen] = useState(false)
+
+  const {
+    data: engineers,
+  } = useGetEngineersOptions('SAFETY')
+
+  const { data: licenseNames } = useGetLicenseNames()
+  const { data: safetyEngineerFilter } = useGetSafetyEngineerFilter()
 
   const {
     data: safetyProjectsPages,
@@ -88,13 +94,6 @@ export default function SafetyPage() {
   }))
 
 
-
-  const {
-    data: engineers,
-  } = useGetEngineersOptions('SAFETY')
-
-  const { data: licenseNames } = useGetLicenseNames()
-
   const [loading, setLoading] = useState(false)
 
   const total_loading = loading || isLoadingPages
@@ -107,14 +106,24 @@ export default function SafetyPage() {
       ...SAFETY_PROJECT_FILTER_INFO,
       engineerName: {
         ...SAFETY_PROJECT_FILTER_INFO.engineerName,
-        options: engineers?.map(engineer => ({ value: engineer.engineerName, label: engineer.engineerName }))
+        options: safetyEngineerFilter
+          ?.filter(
+            engineer => engineer && engineer.engineerSeq != null
+          )
+          .map(engineer => ({
+            value: engineer.engineerSeq.toString(),          // 쿼리에는 seq
+            label: `${engineer.name} (${engineer.grade})`    // 화면 표시는 이름(+등급)
+          }))
       },
       licenseName: {
         ...SAFETY_PROJECT_FILTER_INFO.licenseName,
-        options: licenseNames?.map(l => ({ value: l.id.toString(), label: l.licenseName }))
+        options: licenseNames?.map(l => ({
+          value: l.id.toString(),
+          label: l.licenseName
+        }))
       }
     }),
-    [engineers, licenseNames]
+    [safetyEngineerFilter, licenseNames]
   )
 
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅까지 해주는 함수
@@ -135,7 +144,10 @@ export default function SafetyPage() {
 
       const filterKeys = Object.keys(EXTENDED_SAFETY_PROJECT_FILTER_INFO)
 
-      filterKeys.forEach(v => params.delete(v))
+      filterKeys.forEach(v => {
+        const paramKey = v === 'licenseName' ? 'licenseSeq' : v === 'engineerName' ? 'engineerSeq' : v
+        params.delete(paramKey)
+      })
     })
 
     setCurMonth(null)
@@ -243,6 +255,101 @@ export default function SafetyPage() {
     return
   }
 
+  const getActiveFilters = useCallback(() => {
+    const params = new URLSearchParams(searchParams)
+    const activeFilters: Array<{ key: string; label: string; value: string; displayValue: string }> = []
+
+    Object.keys(EXTENDED_SAFETY_PROJECT_FILTER_INFO).forEach(filterKey => {
+      const paramKey =
+        filterKey === 'licenseName' ? 'licenseSeq'
+          : filterKey === 'engineerName' ? 'engineerSeq'
+            : filterKey
+
+      const filterValue = params.get(paramKey)
+      if (filterValue && filterValue !== '') {
+        const filterInfo = EXTENDED_SAFETY_PROJECT_FILTER_INFO[filterKey as keyof SafetyProjectFilterType]
+        const filterLabel = filterInfo.label
+
+        if (filterInfo.type === 'multi') {
+          const values = filterValue.split(',')
+
+          values.forEach(value => {
+            let displayValue = value
+
+            if (filterKey === 'licenseName') {
+              const license = licenseNames?.find(l => String(l.id) === value)
+              displayValue = license?.licenseName ?? value
+            } else if (filterKey === 'engineerName') {
+              const engineer = safetyEngineerFilter?.find(e => String(e.engineerSeq) === value)
+              displayValue = engineer ? `${engineer.name} (${engineer.grade})` : value
+            } else {
+              const option = filterInfo.options?.find(opt => String(opt.value) === value)
+              displayValue = option ? option.label : value
+            }
+
+            activeFilters.push({
+              key: filterKey,
+              label: filterLabel,
+              value,
+              displayValue
+            })
+          })
+        }
+      }
+    })
+
+    // 건물명 검색도 Chip으로 표시 (UsersPage의 name 필터와 동일 패턴)
+    const placeNameValue = params.get('placeName')
+    if (placeNameValue && placeNameValue !== '') {
+      activeFilters.push({
+        key: 'placeName',
+        label: '건물명',
+        value: placeNameValue,
+        displayValue: placeNameValue
+      })
+    }
+
+    return activeFilters
+  }, [searchParams, EXTENDED_SAFETY_PROJECT_FILTER_INFO, engineers, licenseNames, safetyEngineerFilter])
+
+  const removeFilter = useCallback(
+    (filterKey: string, filterValue: string) => {
+      updateParams(params => {
+        // placeName(건물명 검색)은 MEMBER_FILTER_INFO에 해당 키가 없으므로 바로 제거
+        if (filterKey === 'placeName') {
+          params.delete('placeName')
+          params.delete('page')
+          return
+        }
+
+        const paramKey = filterKey === 'licenseName' ? 'licenseSeq' : filterKey === 'engineerName' ? 'engineerSeq' : filterKey
+        const currentValue = params.get(paramKey)
+
+        if (!currentValue) return
+
+        const filterInfo = EXTENDED_SAFETY_PROJECT_FILTER_INFO[filterKey as keyof SafetyProjectFilterType]
+
+        // multi 타입인 경우 콤마로 구분된 값에서 제거
+        if (filterInfo?.type === 'multi') {
+          const values = currentValue.split(',').filter(v => v !== filterValue)
+
+          if (values.length > 0) {
+            params.set(paramKey, values.join(','))
+          } else {
+            params.delete(paramKey)
+          }
+        } else {
+          // single 타입인 경우 전체 제거
+          params.delete(paramKey)
+        }
+
+        // 필터 변경 시 페이지를 0으로 리셋
+        params.delete('page')
+      })
+    },
+    [updateParams, EXTENDED_SAFETY_PROJECT_FILTER_INFO]
+  )
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='ko'>
       <Backdrop
@@ -269,15 +376,32 @@ export default function SafetyPage() {
           filterInfo={EXTENDED_SAFETY_PROJECT_FILTER_INFO}
           disabled={disabled}
         />
-        {/* 필터 초기화 버튼 */}
-        <Button
-          startIcon={<IconReload />}
-          onClick={resetQueryParams}
-          className='max-sm:is-full absolute right-8 top-8'
-          disabled={disabled}
-        >
-          필터 초기화
-        </Button>
+
+        {/* 활성화된 필터 Chip 표시 */}
+        {getActiveFilters().length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 6, pb: 2 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {getActiveFilters().map((filter, index) => (
+                <Chip
+                  key={`${filter.key}-${filter.value}-${index}`}
+                  label={`${filter.label}: ${filter.displayValue}`}
+                  onDelete={() => removeFilter(filter.key, filter.value)}
+                  color='primary'
+                  variant='outlined'
+                  size='small'
+                />
+              ))}
+            </Box>
+            <Button
+              startIcon={<IconReload />}
+              onClick={resetQueryParams}
+              size='small'
+              disabled={disabled}
+            >
+              필터 초기화
+            </Button>
+          </Box>
+        )}
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <div className='flex gap-8 items-center'>
             <div className='flex gap-2 flex-wrap'>
