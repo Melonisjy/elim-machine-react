@@ -109,8 +109,8 @@ export default function SafetyPage() {
         ...SAFETY_PROJECT_FILTER_INFO.engineerName,
         options: engineers?.map(engineer => ({ value: engineer.engineerName, label: engineer.engineerName }))
       },
-      companyName: {
-        ...SAFETY_PROJECT_FILTER_INFO.companyName,
+      licenseName: {
+        ...SAFETY_PROJECT_FILTER_INFO.licenseName,
         options: licenseNames?.map(l => ({ value: l.id.toString(), label: l.licenseName }))
       }
     }),
