@@ -19,7 +19,7 @@ import dayjs from 'dayjs'
 
 import { IconCopyPlusFilled, IconPlus, IconReload, IconTrashFilled } from '@tabler/icons-react'
 
-import { Backdrop, CircularProgress, Typography, Chip, Box } from '@mui/material'
+import { Backdrop, CircularProgress, Typography, Chip, Box, Alert } from '@mui/material'
 
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -485,9 +485,11 @@ export default function SafetyPage() {
             추가
           </Button>
         </div>
-        <Typography color='warning.main' sx={{ px: 3 }}>
-          ※우클릭으로 현장을 삭제하거나 복사할 수 있습니다
-        </Typography>
+        <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
+          <Typography variant="body2">
+            우클릭으로 현장을 삭제하거나 복사할 수 있습니다
+          </Typography>
+        </Alert>
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
           <BasicTable<SafetyProjectDtoType>
