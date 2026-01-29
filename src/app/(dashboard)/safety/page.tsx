@@ -24,16 +24,16 @@ import { Backdrop, CircularProgress, Typography, Chip, Box } from '@mui/material
 import { useQueryClient } from '@tanstack/react-query'
 
 
-import type { SafetyProjectDtoType, SafetyProjectFilterType, SafetyProjectPageResponseDtoType } from '@core/types'
+import type { SafetyProjectDtoType, SafetyProjectFilterType } from '@core/types'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import SearchBar from '@core/components/elim-inputbox/SearchBar'
 import BasicTable from '@core/components/elim-table/BasicTable'
 import AddSafetyProjectModal from './_components/AddSafetyProjectModal'
-import { DEFAULT_PAGESIZE, PageSizeOptions } from '@core/data/options'
+import { DEFAULT_PAGESIZE } from '@core/data/options'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
-import { useGetEngineersOptions, useGetLicenseNames, useGetSafetyProjects, useGetSafetyEngineerFilter } from '@core/hooks/customTanstackQueries'
+import { useGetEngineersOptions, useGetLicenseNames, useGetSafetyProjects, useGetSafetyEngineerFilter, useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import { QUERY_KEYS } from '@core/data/queryKeys'
 import useUpdateParams from '@/@core/hooks/searchParams/useUpdateParams'
 import useSetQueryParams from '@/@core/hooks/searchParams/useSetQueryParams'
@@ -73,6 +73,7 @@ export default function SafetyPage() {
   } = useGetEngineersOptions('SAFETY')
 
   const { data: licenseNames } = useGetLicenseNames()
+  const { data: licenseFilter } = useGetLicenseFilter()
   const { data: safetyEngineerFilter } = useGetSafetyEngineerFilter()
 
   const {
@@ -277,8 +278,8 @@ export default function SafetyPage() {
             let displayValue = value
 
             if (filterKey === 'licenseName') {
-              const license = licenseNames?.find(l => String(l.id) === value)
-              displayValue = license?.licenseName ?? value
+              const license = licenseFilter?.find(l => String(l.licenseSeq) === value)
+              displayValue = license?.name ?? value
             } else if (filterKey === 'engineerName') {
               const engineer = safetyEngineerFilter?.find(e => String(e.engineerSeq) === value)
               displayValue = engineer ? `${engineer.name} (${engineer.grade})` : value
@@ -310,7 +311,7 @@ export default function SafetyPage() {
     }
 
     return activeFilters
-  }, [searchParams, EXTENDED_SAFETY_PROJECT_FILTER_INFO, engineers, licenseNames, safetyEngineerFilter])
+  }, [searchParams, EXTENDED_SAFETY_PROJECT_FILTER_INFO, engineers, licenseNames, safetyEngineerFilter, licenseFilter])
 
   const removeFilter = useCallback(
     (filterKey: string, filterValue: string) => {
