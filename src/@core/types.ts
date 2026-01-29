@@ -592,8 +592,8 @@ export interface SafetyProjectPageResponseDtoType {
 
 // 안전진단현장 필터
 export interface SafetyProjectFilterType {
-  projectStatus: projectStatusType
-  companyName: string
+  status: projectStatusType
+  licenseName: string
   engineerName: string
   region: string
 }
