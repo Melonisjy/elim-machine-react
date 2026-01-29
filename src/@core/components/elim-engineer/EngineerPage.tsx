@@ -20,7 +20,7 @@ import { Backdrop, CircularProgress, Typography } from '@mui/material'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Style Imports
-import type { EngineerFilterType, engineerTypeType, MachineEngineerPageResponseDtoType } from '@core/types'
+import type { EngineerFilterType, engineerTypeType, MachineEngineerRowDtoType, SafetyEngineerPageResponseDtoType, SafetyEngineerRowDtoType, successResponseDtoType } from '@core/types'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import BasicTable from '@core/components/elim-table/BasicTable'
 import SearchBar from '@core/components/elim-inputbox/SearchBar'
@@ -28,7 +28,7 @@ import { DEFAULT_PAGESIZE, PageSizeOptions } from '@core/data/options'
 import { ENGINEER_FILTER_INFO } from '@core/data/filter/engineerFilterInfo'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
-import { useGetEngineer, useGetEngineers, useGetEngineersOptions } from '@core/hooks/customTanstackQueries'
+import { useGetEngineer, useGetMachineEngineers, useGetEngineersOptions, useGetSafetyEngineers } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useUpdateParams from '@/@core/hooks/searchParams/useUpdateParams'
 import useSetQueryParams from '@/@core/hooks/searchParams/useSetQueryParams'
@@ -67,19 +67,31 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
     data: engineersPages,
     refetch: refetchPages,
     isLoading,
-    isError
-  } = useGetEngineers(searchParams.toString(), engineerType)
+    isError,
+  } = engineerType === 'MACHINE'
+      ? useGetMachineEngineers(searchParams.toString(), engineerType)
+      : useGetSafetyEngineers(searchParams.toString())
 
-  const data = engineersPages?.content
+  type EngineerRowDtoType = MachineEngineerRowDtoType | SafetyEngineerRowDtoType
+
+
+  type MachineEngineersResponse = successResponseDtoType<MachineEngineerRowDtoType[]>
+
+  const data: EngineerRowDtoType[] =
+    engineerType === 'MACHINE'
+      ? ((engineersPages as MachineEngineersResponse | undefined)?.content ?? [])
+      : ((engineersPages as SafetyEngineerPageResponseDtoType | undefined)?.items ?? [])
+
+  const totalCount =
+    engineerType === 'MACHINE'
+      ? ((engineersPages as MachineEngineersResponse | undefined)?.page.totalElements ?? 0)
+      : ((engineersPages as SafetyEngineerPageResponseDtoType | undefined)?.total ?? 0)
 
   // 로딩 시도 중 = true, 로딩 끝 = false
   const [loading, setLoading] = useState(false)
 
   // 로딩이 끝나고 에러가 없으면 not disabled
   const disabled = loading || isError || isLoading
-
-  // 전체 데이터 개수 => fetching한 데이터에서 추출
-  const totalCount = engineersPages?.page.totalElements ?? 0
 
   // 페이지네이션 관련
   const page = Number(searchParams.get('page') ?? 0)
@@ -119,37 +131,52 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
     })
   }, [updateParams])
 
-  // 엔지니어 선택 핸들러
-  const handleEngineerClick = async (engineerData: MachineEngineerPageResponseDtoType) => {
+  const handleEngineerClick = async (row: EngineerRowDtoType) => {
+    // SAFETY 쪽은 아직 상세 모달 안 열어도 되면 그냥 리턴
+    if (engineerType === 'SAFETY') return
+
+    const engineer = row as MachineEngineerRowDtoType
     try {
-      setSelectedId(engineerData.engineerId)
+      setSelectedId(engineer.engineerId)
       setOpenDetail(true)
     } catch (error) {
       handleApiError(error, '엔지니어를 선택하는 데 실패했습니다.')
     }
   }
 
-  // 설비인력 체크 핸들러 (다중선택)
-  const handleCheckEngineer = (engineer: MachineEngineerPageResponseDtoType) => {
-    const obj = { engineerId: engineer.engineerId, version: engineer.version }
-    const checked = isChecked(engineer)
+  const handleCheckEngineer = (row: EngineerRowDtoType) => {
+    if (engineerType === 'SAFETY') return
 
-    if (!checked) {
+    const engineer = row as MachineEngineerRowDtoType
+    const obj = { engineerId: engineer.engineerId, version: engineer.version }
+    const checkedFlag = isChecked(engineer)
+
+    if (!checkedFlag) {
       setChecked(prev => prev.concat(obj))
     } else {
       setChecked(prev => prev.filter(v => v.engineerId !== engineer.engineerId))
     }
   }
 
-  const handleCheckAllEngineers = (checked: boolean) => {
-    if (checked) {
-      setChecked(data?.map(v => ({ engineerId: v.engineerId, version: v.version })) ?? [])
+  const handleCheckAllEngineers = (checkedFlag: boolean) => {
+    if (engineerType === 'SAFETY') return
+
+    if (checkedFlag) {
+      setChecked(
+        (data as MachineEngineerRowDtoType[]).map(v => ({
+          engineerId: v.engineerId,
+          version: v.version,
+        })),
+      )
     } else {
       setChecked([])
     }
   }
 
-  const isChecked = (engineer: MachineEngineerPageResponseDtoType) => {
+  const isChecked = (row: EngineerRowDtoType) => {
+    if (engineerType === 'SAFETY') return false
+
+    const engineer = row as MachineEngineerRowDtoType
     return checked.some(v => v.engineerId === engineer.engineerId)
   }
 
@@ -320,14 +347,20 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
         </Typography>
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
-          <BasicTable<MachineEngineerPageResponseDtoType>
-            multiException={{ latestProjectBeginDate: ['latestProjectBeginDate', 'latestProjectEndDate'] }}
-            header={TABLE_HEADER_INFO.engineers}
+          <BasicTable<EngineerRowDtoType>
+            multiException={
+              engineerType === 'MACHINE'
+                ? ({ latestProjectBeginDate: ['latestProjectBeginDate', 'latestProjectEndDate'] } as Partial<
+                  Record<keyof EngineerRowDtoType, Array<keyof EngineerRowDtoType>>
+                >)
+                : undefined
+            }
+            header={engineerType === 'MACHINE' ? TABLE_HEADER_INFO.machineEngineers : TABLE_HEADER_INFO.safetyEngineers}
             data={data}
             handleRowClick={handleEngineerClick}
             loading={isLoading}
             error={isError}
-            showCheckBox={showCheckBox}
+            showCheckBox={engineerType === 'MACHINE' && showCheckBox}
             isChecked={isChecked}
             handleCheckItem={handleCheckEngineer}
             handleCheckAllItems={handleCheckAllEngineers}
@@ -337,11 +370,13 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
                 icon: <IconBoltOff color='gray' size={20} />,
                 label: `${engineerTerm}에서 제외`,
                 handleClick: async row => {
-                  await deleteEngineer(row.engineerId, row.version)
+                  if (engineerType === 'SAFETY') return
+                  const engineer = row as MachineEngineerRowDtoType
+                  await deleteEngineer(engineer.engineerId, engineer.version)
                   adjustPage(-1)
                   removeQueryCaches()
-                }
-              }
+                },
+              },
             ]}
           />
         </div>
