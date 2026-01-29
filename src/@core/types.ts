@@ -595,6 +595,7 @@ export interface SafetyProjectFilterType {
   status: projectStatusType
   licenseName: string
   engineerName: string
+  inspectionType: string
   region: string
 }
 

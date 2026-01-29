@@ -27,7 +27,7 @@ export default function BasicTableFilter<T>({ filterInfo, disabled, padding = 6 
   const setSearchParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams)
 
-    const queryKey = key === 'licenseName' ? 'licenseSeq' : key
+    const queryKey = key === 'licenseName' ? 'licenseSeq' : key === 'engineerName' ? 'engineerSeq' : key
 
     params.delete('page')
     if (value !== '') params.set(queryKey, value)
@@ -45,7 +45,7 @@ export default function BasicTableFilter<T>({ filterInfo, disabled, padding = 6 
           tabInfos={filterInfo}
           tabFieldKey={property}
           disabled={disabled}
-          value={searchParams.get(property === 'licenseName' ? 'licenseSeq' : property) ?? ''}
+          value={searchParams.get(property === 'licenseName' ? 'licenseSeq' : property === 'engineerName' ? 'engineerSeq' : property) ?? ''}
           onChange={value => setSearchParam(property, value)}
           placeholder={filterInfo[property as keyof T]?.label}
           showLabel={false}

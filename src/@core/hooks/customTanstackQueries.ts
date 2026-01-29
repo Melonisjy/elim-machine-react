@@ -2373,6 +2373,30 @@ export const useGetSafetyProjects = createQueryHook<SafetyProjectPageResponseDto
   '안전진단현장 조회 실패'
 )
 
+// GET /web/safetyEngineerFilter
+export const useGetSafetyEngineerFilter = () => {
+  return useQuery({
+    queryKey: ['GET_SAFETY_ENGINEER_FILTER'],
+    queryFn: async () => {
+      const response = await phpAuth
+        .get<PhpApiResult<{ items: { engineerSeq: number; name: string; grade: string }[] }>>(
+          '/web/safetyEngineerFilter'
+        )
+        .then(v => {
+          if (v.data.success && v.data.data) {
+            console.log('v.data', v.data)
+            return v.data.data.items
+          }
+          throw new Error(v.data.message || '점검자 필터 조회 실패')
+        })
+
+      console.log('!!! queryFn GET_SAFETY_ENGINEER_FILTER:')
+      return response
+    },
+    staleTime: 1000 * 60 * 5 // 5분
+  })
+}
+
 // GET /web/users/licenseFilter
 export const useGetLicenseFilter = () => {
   return useQuery({
