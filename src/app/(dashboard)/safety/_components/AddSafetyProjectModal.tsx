@@ -20,6 +20,7 @@ import styles from '@core/styles/customTable.module.css'
 import { safetyInspectionTypeOption } from '@/@core/data/options'
 import SelectTd from '@core/components/elim-inputbox/SelectTd'
 import TextFieldTd from '@core/components/elim-inputbox/TextFieldTd'
+import FileUploadButton from '@/@core/components/elim-button/FileUploadButton'
 
 type AddSafetyProjectModalProps = {
   open: boolean
@@ -68,6 +69,11 @@ export default function AddSafetyProjectModal({ open, setOpen, reloadPage }: Add
     }
   })
 
+  const handleUpload = (file: File) => {
+    // todo
+    console.log('file', file)
+  }
+
   return (
     <DefaultModal
       size='sm'
@@ -78,6 +84,15 @@ export default function AddSafetyProjectModal({ open, setOpen, reloadPage }: Add
         <Button variant='contained' onClick={onSubmitHandler} type='submit' disabled={loading}>
           추가
         </Button>
+      }
+      uploadButton={
+        <FileUploadButton
+          onFileSelect={handleUpload}
+          accept=".pdf"
+          variant="button"
+          buttonText="시설물대장 업로드"
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded ml-4"
+        />
       }
       secondaryButton={
         <Button variant='contained' color='secondary' type='reset' onClick={() => setOpen(false)}>
