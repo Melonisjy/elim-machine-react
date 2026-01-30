@@ -628,8 +628,8 @@ export interface SafetyProjectCreateRequestDtoType {
   companyName: string
   safetyInspectionType: safetyInspectionTypeType
   buildingName: string
-  uniqueNo: string | null
-  facilityNo: string | null
+  uniqueNum: string | null
+  facilityNum: string | null
   buildingId: string | null
   beginDate: string
   endDate: string
