@@ -97,8 +97,8 @@ const AddEngineerModal = ({ open, setOpen, reloadPage }: AddEngineerModalProps) 
       <div className={classNames('grid gap-5 pt-2 overflow-visible sm:pli-16', styles.container)}>
         <table style={{ tableLayout: 'fixed' }}>
           <colgroup>
-            <col width={'25%'} />
-            <col width={'75%'} />
+            <col width={'30%'} />
+            <col width={'70%'} />
           </colgroup>
           <tbody>
             <tr className={styles.required}>
@@ -121,7 +121,7 @@ const AddEngineerModal = ({ open, setOpen, reloadPage }: AddEngineerModalProps) 
               <SelectTd form={form} name='grade' option={gradeOption} />
             </tr>
             <tr>
-              <th>수첩발급번호</th>
+              <th>기술자 자격번호</th>
               <TextFieldTd form={form} name='engineerLicenseNum' />
             </tr>
           </tbody>
