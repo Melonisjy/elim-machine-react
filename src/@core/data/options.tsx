@@ -143,7 +143,7 @@ export const workFormOption: { value: workFormType; label: string }[] = [
 ]
 
 export const gradeOption: { value: gradeType; label: string }[] = [
-  { value: 'ASSIST', label: '보조' },
+  { value: 'ASSIST', label: '참여' },
   { value: 'BEGINNER', label: '초급' },
   { value: 'INTERMEDIATE', label: '중급' },
   { value: 'ADVANCED', label: '고급' },

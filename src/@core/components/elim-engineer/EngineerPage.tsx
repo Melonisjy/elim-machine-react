@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, createContext, useContext } from 'react'
+import { useState, useCallback, createContext, useContext, useMemo } from 'react'
 
 // MUI Imports
 import { useSearchParams } from 'next/navigation'
@@ -15,12 +15,12 @@ import { IconBoltOff, IconPlus, IconReload } from '@tabler/icons-react'
 
 import { useQueryClient } from '@tanstack/react-query'
 
-import { Backdrop, CircularProgress, Typography } from '@mui/material'
+import { Alert, Backdrop, CircularProgress, Typography } from '@mui/material'
 
 import CustomTextField from '@core/components/mui/TextField'
 
 // Style Imports
-import type { EngineerFilterType, engineerTypeType, MachineEngineerPageResponseDtoType } from '@core/types'
+import type { EngineerFilterType, engineerTypeType, MachineEngineerRowDtoType, SafetyEngineerPageResponseDtoType, SafetyEngineerRowDtoType, successResponseDtoType } from '@core/types'
 import { TABLE_HEADER_INFO } from '@/@core/data/table/tableHeaderInfo'
 import BasicTable from '@core/components/elim-table/BasicTable'
 import SearchBar from '@core/components/elim-inputbox/SearchBar'
@@ -28,10 +28,13 @@ import { DEFAULT_PAGESIZE, PageSizeOptions } from '@core/data/options'
 import { ENGINEER_FILTER_INFO } from '@core/data/filter/engineerFilterInfo'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
-import { useGetEngineer, useGetEngineers, useGetEngineersOptions } from '@core/hooks/customTanstackQueries'
+
+import { useGetEngineer, useGetMachineEngineers, useGetEngineersOptions, useGetSafetyEngineers, useGetLicenseFilter } from '@core/hooks/customTanstackQueries'
 import BasicTableFilter from '@/@core/components/elim-table/BasicTableFilter'
 import useUpdateParams from '@/@core/hooks/searchParams/useUpdateParams'
 import useSetQueryParams from '@/@core/hooks/searchParams/useSetQueryParams'
+import useFilterChips from '@core/hooks/useFilterChips'
+import FilterChipBar from '@core/components/elim-table/FilterChipBar'
 import BasicTablePagination from '@core/components/elim-table/BasicTablePagination'
 import deleteEngineer from '../../utils/deleteEngineer'
 import AddEngineerModal from './AddEngineerModal'
@@ -57,29 +60,68 @@ export function useEngineerTypeContext() {
 export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerType?: engineerTypeType }) {
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
+  const { data: licenseFilter } = useGetLicenseFilter()
+
 
   const engineerTerm = ({ MACHINE: '기계설비 기술자', SAFETY: '안전진단 기술자' } as Record<engineerTypeType, string>)[
     engineerType
   ]
+
+  const EXTENDED_ENGINEER_FILTER_INFO = useMemo(
+    () => ({
+      ...ENGINEER_FILTER_INFO,
+      licenseName: {
+        ...ENGINEER_FILTER_INFO.licenseName,
+        options: licenseFilter?.map(l => ({
+          value: String(l.licenseSeq),
+          label: l.name,
+        })),
+      },
+    }),
+    [licenseFilter],
+  )
+
+  const { activeFilters, removeFilter } = useFilterChips<EngineerFilterType>({
+    filterInfo: EXTENDED_ENGINEER_FILTER_INFO,
+    extraTextFilters: [
+      { key: 'name', label: '이름' },
+      { key: 'projectName', label: '현장명' },
+    ],
+    paramKeyMapper: key =>
+      key === 'licenseName' ? 'licenseSeq' // ✅ 회사 필터는 licenseSeq에 저장됨
+        : key,
+  })
 
   // 데이터 리스트
   const {
     data: engineersPages,
     refetch: refetchPages,
     isLoading,
-    isError
-  } = useGetEngineers(searchParams.toString(), engineerType)
+    isError,
+  } = engineerType === 'MACHINE'
+      ? useGetMachineEngineers(searchParams.toString(), engineerType)
+      : useGetSafetyEngineers(searchParams.toString())
 
-  const data = engineersPages?.content
+  type EngineerRowDtoType = MachineEngineerRowDtoType | SafetyEngineerRowDtoType
+
+
+  type MachineEngineersResponse = successResponseDtoType<MachineEngineerRowDtoType[]>
+
+  const data: EngineerRowDtoType[] =
+    engineerType === 'MACHINE'
+      ? ((engineersPages as MachineEngineersResponse | undefined)?.content ?? [])
+      : ((engineersPages as SafetyEngineerPageResponseDtoType | undefined)?.items ?? [])
+
+  const totalCount =
+    engineerType === 'MACHINE'
+      ? ((engineersPages as MachineEngineersResponse | undefined)?.page.totalElements ?? 0)
+      : ((engineersPages as SafetyEngineerPageResponseDtoType | undefined)?.total ?? 0)
 
   // 로딩 시도 중 = true, 로딩 끝 = false
   const [loading, setLoading] = useState(false)
 
   // 로딩이 끝나고 에러가 없으면 not disabled
   const disabled = loading || isError || isLoading
-
-  // 전체 데이터 개수 => fetching한 데이터에서 추출
-  const totalCount = engineersPages?.page.totalElements ?? 0
 
   // 페이지네이션 관련
   const page = Number(searchParams.get('page') ?? 0)
@@ -102,6 +144,7 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
   // params를 변경하는 함수를 입력하면 해당 페이지로 라우팅까지 해주는 함수
   const updateParams = useUpdateParams()
 
+
   type paramType = 'page' | 'size' | 'name' | 'projectName'
 
   const setQueryParams = useSetQueryParams<paramType>()
@@ -119,37 +162,52 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
     })
   }, [updateParams])
 
-  // 엔지니어 선택 핸들러
-  const handleEngineerClick = async (engineerData: MachineEngineerPageResponseDtoType) => {
+  const handleEngineerClick = async (row: EngineerRowDtoType) => {
+    // SAFETY 쪽은 아직 상세 모달 안 열어도 되면 그냥 리턴
+    if (engineerType === 'SAFETY') return
+
+    const engineer = row as MachineEngineerRowDtoType
     try {
-      setSelectedId(engineerData.engineerId)
+      setSelectedId(engineer.engineerId)
       setOpenDetail(true)
     } catch (error) {
       handleApiError(error, '엔지니어를 선택하는 데 실패했습니다.')
     }
   }
 
-  // 설비인력 체크 핸들러 (다중선택)
-  const handleCheckEngineer = (engineer: MachineEngineerPageResponseDtoType) => {
-    const obj = { engineerId: engineer.engineerId, version: engineer.version }
-    const checked = isChecked(engineer)
+  const handleCheckEngineer = (row: EngineerRowDtoType) => {
+    if (engineerType === 'SAFETY') return
 
-    if (!checked) {
+    const engineer = row as MachineEngineerRowDtoType
+    const obj = { engineerId: engineer.engineerId, version: engineer.version }
+    const checkedFlag = isChecked(engineer)
+
+    if (!checkedFlag) {
       setChecked(prev => prev.concat(obj))
     } else {
       setChecked(prev => prev.filter(v => v.engineerId !== engineer.engineerId))
     }
   }
 
-  const handleCheckAllEngineers = (checked: boolean) => {
-    if (checked) {
-      setChecked(data?.map(v => ({ engineerId: v.engineerId, version: v.version })) ?? [])
+  const handleCheckAllEngineers = (checkedFlag: boolean) => {
+    if (engineerType === 'SAFETY') return
+
+    if (checkedFlag) {
+      setChecked(
+        (data as MachineEngineerRowDtoType[]).map(v => ({
+          engineerId: v.engineerId,
+          version: v.version,
+        })),
+      )
     } else {
       setChecked([])
     }
   }
 
-  const isChecked = (engineer: MachineEngineerPageResponseDtoType) => {
+  const isChecked = (row: EngineerRowDtoType) => {
+    if (engineerType === 'SAFETY') return false
+
+    const engineer = row as MachineEngineerRowDtoType
     return checked.some(v => v.engineerId === engineer.engineerId)
   }
 
@@ -218,18 +276,13 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
           className='pbe-4'
         />
         {/* 필터바 */}
-        <BasicTableFilter<EngineerFilterType> filterInfo={ENGINEER_FILTER_INFO} disabled={disabled} />
-        {/* 필터 초기화 버튼 */}
-        <Button
-          startIcon={<IconReload />}
-          onClick={() => {
-            resetQueryParams()
-          }}
-          className='max-sm:is-full absolute right-8 top-8'
+        <BasicTableFilter<EngineerFilterType> filterInfo={EXTENDED_ENGINEER_FILTER_INFO} disabled={disabled} />
+        <FilterChipBar
+          activeFilters={activeFilters}
+          removeFilter={removeFilter}
+          onReset={resetQueryParams}
           disabled={disabled}
-        >
-          필터 초기화
-        </Button>
+        />
         <div className=' flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <div className='flex gap-2'>
             {/* 페이지당 행수 */}
@@ -315,19 +368,28 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
             </Button>
           </div>
         </div>
-        <Typography color='warning.main' sx={{ px: 3 }}>
-          {`※우클릭으로 ${engineerTerm}에서 제외할 수 있습니다`}
-        </Typography>
+        <Alert severity="info" sx={{ mx: 3, mb: 2 }}>
+          <Typography variant="body2">
+            {`우클릭으로 ${engineerTerm}에서 제외할 수 있습니다`}
+          </Typography>
+        </Alert>
+
         {/* 테이블 */}
         <div className='flex-1 overflow-y-hidden'>
-          <BasicTable<MachineEngineerPageResponseDtoType>
-            multiException={{ latestProjectBeginDate: ['latestProjectBeginDate', 'latestProjectEndDate'] }}
-            header={TABLE_HEADER_INFO.engineers}
+          <BasicTable<EngineerRowDtoType>
+            multiException={
+              engineerType === 'MACHINE'
+                ? ({ latestProjectBeginDate: ['latestProjectBeginDate', 'latestProjectEndDate'] } as Partial<
+                  Record<keyof EngineerRowDtoType, Array<keyof EngineerRowDtoType>>
+                >)
+                : undefined
+            }
+            header={engineerType === 'MACHINE' ? TABLE_HEADER_INFO.machineEngineers : TABLE_HEADER_INFO.safetyEngineers}
             data={data}
             handleRowClick={handleEngineerClick}
             loading={isLoading}
             error={isError}
-            showCheckBox={showCheckBox}
+            showCheckBox={engineerType === 'MACHINE' && showCheckBox}
             isChecked={isChecked}
             handleCheckItem={handleCheckEngineer}
             handleCheckAllItems={handleCheckAllEngineers}
@@ -337,11 +399,13 @@ export default function EngineerPage({ engineerType = 'MACHINE' }: { engineerTyp
                 icon: <IconBoltOff color='gray' size={20} />,
                 label: `${engineerTerm}에서 제외`,
                 handleClick: async row => {
-                  await deleteEngineer(row.engineerId, row.version)
+                  if (engineerType === 'SAFETY') return
+                  const engineer = row as MachineEngineerRowDtoType
+                  await deleteEngineer(engineer.engineerId, engineer.version)
                   adjustPage(-1)
                   removeQueryCaches()
-                }
-              }
+                },
+              },
             ]}
           />
         </div>

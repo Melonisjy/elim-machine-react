@@ -69,7 +69,7 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     checkDate: { label: '점검일', canSort: false },
     inspectionStatus: { label: '결과', canSort: false }
   },
-  engineers: {
+  machineEngineers: {
     companyName: { label: '회사명', canSort: false },
     gradeDescription: { label: '등급', canSort: true },
     name: { label: '이름', canSort: true },
@@ -83,6 +83,20 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     projectCnt: { label: '현장수', canSort: false },
     latestProjectName: { label: '마지막현장', canSort: false },
     latestProjectBeginDate: { label: '투입기간', canSort: false }, // latestProjectEndDate도 함께 표시
+    remark: { label: '비고', canSort: false }
+  },
+  safetyEngineers: {
+    licenseName: { label: '회사명', canSort: false },
+    grade: { label: '등급', canSort: true },
+    name: { label: '이름', canSort: true },
+    department: { label: '부서', canSort: false },
+    position: { label: '직급', canSort: false },
+    licenseNum: { label: '기술자 자격번호', canSort: false, width: '180px' },
+    email: { label: '이메일', canSort: false },
+    status: { label: '상태', canSort: false },
+    projectCnt: { label: '현장수', canSort: false },
+    lastProject: { label: '마지막현장', canSort: false },
+    lastProjectDate: { label: '투입기간', canSort: false }, // latestProjectEndDate도 함께 표시
     remark: { label: '비고', canSort: false }
   },
   licenses: {

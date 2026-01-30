@@ -21,7 +21,7 @@ import type {
   MachineCategoryResponseDtoType,
   MachineEnergyTypeResponseDtoType,
   MachineEngineerOptionResponseDtoType,
-  MachineEngineerPageResponseDtoType,
+  MachineEngineerRowDtoType,
   MachineInspectionChecklistItemResultResponseDtoType,
   MachineInspectionChecklistItemResultUpdateRequestDtoType,
   MachineInspectionDetailResponseDtoType,
@@ -83,6 +83,7 @@ import type {
   UserOfficeDtoType,
   UserCareerDtoType,
   UserEtcDtoType,
+  SafetyEngineerPageResponseDtoType,
 } from '@core/types' // 타입 임포트
 import { handleApiError } from '@core/utils/errorHandler'
 
@@ -1301,9 +1302,9 @@ export const useGetEngineersOptions = (engineerType: engineerTypeType = 'MACHINE
 }
 
 // GET /api/engineers
-export const useGetEngineers = (queryParams: string, engineerType: engineerTypeType = 'MACHINE') => {
+export const useGetMachineEngineers = (queryParams: string, engineerType: engineerTypeType = 'MACHINE') => {
   const fetchEngineers: QueryFunction<
-    successResponseDtoType<MachineEngineerPageResponseDtoType[]>,
+    successResponseDtoType<MachineEngineerRowDtoType[]>,
     string[]
   > = useCallback(async data => {
     const [keyType, engineerType, queryParams] = data.queryKey
@@ -1318,7 +1319,7 @@ export const useGetEngineers = (queryParams: string, engineerType: engineerTypeT
 
     const response = await auth
       .get<{
-        data: successResponseDtoType<MachineEngineerPageResponseDtoType[]>
+        data: successResponseDtoType<MachineEngineerRowDtoType[]>
       }>(`/api/engineers?${params}`)
       .then(v => v.data.data)
 
@@ -2371,6 +2372,12 @@ export const useGetSafetyProjects = createQueryHook<SafetyProjectPageResponseDto
   '/web/safety',
   QUERY_KEYS.SAFETY_PROJECT.GET_SAFETY_PROJECTS,
   '안전진단현장 조회 실패'
+)
+
+export const useGetSafetyEngineers = createQueryHook<SafetyEngineerPageResponseDtoType>(
+  '/web/safety/engineers',
+  QUERY_KEYS.SAFETY_ENGINEER.GET_SAFETY_ENGINEERS,
+  '안전진단 인력 조회 실패'
 )
 
 // GET /web/safetyEngineerFilter

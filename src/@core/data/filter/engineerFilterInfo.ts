@@ -2,7 +2,7 @@ import { companyNameOption, gradeOption, workStatusOption } from '@/@core/data/o
 import type { EngineerFilterType, InputFieldType } from '../../types'
 
 export const ENGINEER_FILTER_INFO: Record<keyof EngineerFilterType, InputFieldType> = {
-  companyName: {
+  licenseName: {
     type: 'multi',
     label: '회사',
     options: companyNameOption
@@ -12,7 +12,7 @@ export const ENGINEER_FILTER_INFO: Record<keyof EngineerFilterType, InputFieldTy
     label: '등급',
     options: gradeOption
   },
-  workStatus: {
+  status: {
     type: 'multi',
     label: '상태',
     options: workStatusOption

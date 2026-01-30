@@ -41,7 +41,8 @@ export interface tableHeaderInfoType {
   machineProject: HeaderType<MachineProjectPageDtoType>
   safetyProject: HeaderType<SafetyProjectDtoType>
   machineInspection: HeaderType<MachineInspectionPageResponseDtoType>
-  engineers: HeaderType<MachineEngineerPageResponseDtoType>
+  machineEngineers: HeaderType<MachineEngineerRowDtoType>
+  safetyEngineers: HeaderType<SafetyEngineerRowDtoType>
   licenses: HeaderType<LicensePageResponseDtoType>
   loginLog: HeaderType<LoginLogDtoType>
 }
@@ -599,6 +600,29 @@ export interface SafetyProjectFilterType {
   region: string
 }
 
+export interface SafetyEngineerRowDtoType {
+  num: number
+  licenseName: string
+  grade: string
+  name: string
+  department: string
+  position: string
+  licenseNum: string
+  email: string
+  status: string
+  projectCnt: number
+  lastProject: string
+  lastProjectDate: string
+  remark: string
+}
+export interface SafetyEngineerPageResponseDtoType {
+  items: SafetyEngineerRowDtoType[]
+  total: number
+  page: number
+  size: number
+}
+
+
 // POST api/safety/projects
 export interface SafetyProjectCreateRequestDtoType {
   companyName: string
@@ -802,7 +826,7 @@ export interface MachineEngineerOptionResponseDtoType {
 }
 
 // GET api/engineers
-export interface MachineEngineerPageResponseDtoType {
+export interface MachineEngineerRowDtoType {
   engineerId: number
   version: number
   companyName: string
@@ -853,9 +877,9 @@ export interface MachineEngineerCreateRequestDtoType {
 
 // 설비인력 필터
 export interface EngineerFilterType {
-  companyName: string
+  licenseName: string
   grade: string
-  workStatus: workStatusType
+  status: workStatusType
 }
 
 // ----------- 설비목록 -----------
