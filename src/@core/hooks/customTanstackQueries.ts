@@ -1523,6 +1523,7 @@ export const useMutateSingleMemberBasic = (memberId: string) => {
 export type MemberType = 'basic' | 'privacy' | 'office' | 'career' | 'etc'
 // php
 export type UserType = 'basic' | 'privacy' | 'office' | 'career' | 'etc'
+export type SafetyAutocompleteItem = { placeName: string, facilityNum: string, buildingId: string, uniqueNum: string }
 
 const memberRequestInfo: Record<MemberType, { url: string; dtoKey: keyof MemberDetailResponseDtoType }> = {
   basic: { url: '', dtoKey: 'memberBasicResponseDto' },
@@ -2373,6 +2374,34 @@ export const useGetSafetyProjects = createQueryHook<SafetyProjectPageResponseDto
   QUERY_KEYS.SAFETY_PROJECT.GET_SAFETY_PROJECTS,
   '안전진단현장 조회 실패'
 )
+
+// GET /web/safety/autocomplete?type=...&keyword=...
+export const useGetSafetyAutocomplete = (type: string, keyword: string) => {
+  const fetchData: QueryFunction<SafetyAutocompleteItem[], string[]> = useCallback(
+    async data => {
+      const [, _type, _keyword] = data.queryKey
+      const response = await phpAuth
+        .get<PhpApiResult<{ items: SafetyAutocompleteItem[] }>>('/web/safety/autocomplete', {
+          params: { type: _type, keyword: _keyword }
+        })
+        .then(v => {
+          if (v.data.success && v.data.data?.items) return v.data.data.items
+          return []
+        })
+      return response
+    },
+    []
+  )
+
+  return useQuery({
+    queryKey: QUERY_KEYS.SAFETY_PROJECT.GET_SAFETY_AUTOCOMPLETE(type, keyword),
+    queryFn: fetchData,
+    enabled: keyword.trim().length >= 1,  // 1글자 이상일 때만 호출 (2글자로 바꿔도 됨)
+    staleTime: 1000 * 60,  // 1분 (자동완성은 짧게)
+    placeholderData: (previousData) =>
+      keyword.trim().length < 1 ? undefined : previousData,
+  })
+}
 
 export const useGetSafetyEngineers = createQueryHook<SafetyEngineerPageResponseDtoType>(
   '/web/safety/engineers',
