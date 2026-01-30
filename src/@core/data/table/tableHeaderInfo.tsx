@@ -91,7 +91,7 @@ export const TABLE_HEADER_INFO: tableHeaderInfoType = {
     name: { label: '이름', canSort: true },
     department: { label: '부서', canSort: false },
     position: { label: '직급', canSort: false },
-    licenseNum: { label: '수첩발급번호', canSort: false },
+    licenseNum: { label: '기술자 자격번호', canSort: false, width: '180px' },
     email: { label: '이메일', canSort: false },
     status: { label: '상태', canSort: false },
     projectCnt: { label: '현장수', canSort: false },
