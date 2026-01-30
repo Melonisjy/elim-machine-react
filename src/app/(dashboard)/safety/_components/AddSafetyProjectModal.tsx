@@ -4,9 +4,10 @@ import { useState } from 'react'
 
 import Button from '@mui/material/Button'
 
-import { TextField, Typography } from '@mui/material'
+import { Autocomplete, TextField, Typography } from '@mui/material'
 
 import { useForm } from 'react-hook-form'
+import { useDebounce } from 'react-use'
 
 import classNames from 'classnames'
 
@@ -14,6 +15,7 @@ import type { safetyInspectionTypeType, SafetyProjectCreateRequestDtoType } from
 import DefaultModal from '@/@core/components/elim-modal/DefaultModal'
 import { handleApiError, handleSuccess } from '@core/utils/errorHandler'
 import { auth } from '@core/utils/auth'
+import { useGetSafetyAutocomplete } from '@core/hooks/customTanstackQueries'
 import { useGetLicenseNames } from '@core/hooks/customTanstackQueries'
 
 import styles from '@core/styles/customTable.module.css'
@@ -43,14 +45,33 @@ export default function AddSafetyProjectModal({ open, setOpen, reloadPage }: Add
       companyName: '',
       safetyInspectionType: '',
       buildingName: '',
-      uniqueNo: '',
-      facilityNo: '',
+      uniqueNum: '',
+      facilityNum: '',
       buildingId: '',
       beginDate: '',
       endDate: '',
       note: ''
     }
   })
+
+  const buildingNameInput = form.watch('buildingName')
+  const [debouncedKeyword, setDebouncedKeyword] = useState(buildingNameInput ?? '')
+
+  useDebounce(
+    () => setDebouncedKeyword(buildingNameInput ?? ''),
+    300,
+    [buildingNameInput]
+  )
+
+  const autocompleteType = 'place'
+  const { data: buildingAutocompleteData, isLoading: isBuildingOptionsLoading } = useGetSafetyAutocomplete(
+    autocompleteType,
+    debouncedKeyword ?? ''
+  )
+  const buildingOptions =
+    buildingAutocompleteData?.map(item => ({ value: item.placeName, label: item.placeName })) ?? []
+
+
 
   const onSubmitHandler = form.handleSubmit(async data => {
     try {
@@ -73,6 +94,10 @@ export default function AddSafetyProjectModal({ open, setOpen, reloadPage }: Add
     // todo
     console.log('file', file)
   }
+
+  const selectedBuilding = buildingAutocompleteData?.find(
+    o => o.placeName === form.watch('buildingName')
+  )
 
   return (
     <DefaultModal
@@ -127,19 +152,40 @@ export default function AddSafetyProjectModal({ open, setOpen, reloadPage }: Add
             </tr>
             <tr className={styles.required}>
               <th>건물명</th>
-              <TextFieldTd form={form} name='buildingName' placeholder='건물명은 필수입력입니다' />
+              <td className='p-0'>
+                <Autocomplete
+                  sx={{ '.MuiOutlinedInput-notchedOutline': { border: 0, borderRadius: 0 } }}
+                  fullWidth
+                  size='small'
+                  options={buildingOptions}
+                  value={buildingOptions?.find(o => o.value === form.watch('buildingName')) ?? null}
+                  inputValue={form.watch('buildingName')}
+                  onInputChange={(_, newInputValue) =>
+                    form.setValue('buildingName', newInputValue ?? '', { shouldDirty: true })
+                  }
+                  onChange={(_, value) =>
+                    form.setValue('buildingName', value?.value ?? '', { shouldDirty: true })
+                  }
+                  getOptionLabel={option => (typeof option === 'string' ? option : option?.label ?? '')}
+                  noOptionsText='검색어를 입력하세요'
+                  loading={isBuildingOptionsLoading}
+                  renderInput={params => (
+                    <TextField {...params} placeholder='건물명은 필수입력입니다' />
+                  )}
+                />
+              </td>
             </tr>
             <tr>
               <th>시설물번호</th>
-              <TextFieldTd form={form} name='facilityNo' />
+              <TextFieldTd form={form} value={selectedBuilding?.facilityNum ?? ''} name='facilityNum' />
             </tr>
             <tr>
               <th>고유번호</th>
-              <TextFieldTd form={form} name='uniqueNo' />
+              <TextFieldTd form={form} value={selectedBuilding?.uniqueNum ?? ''} name='uniqueNum' />
             </tr>
             <tr>
               <th>건물 ID</th>
-              <TextFieldTd form={form} name='buildingId' />
+              <TextFieldTd form={form} value={selectedBuilding?.buildingId ?? ''} name='buildingId' />
             </tr>
           </tbody>
         </table>
