@@ -96,7 +96,8 @@ export const QUERY_KEYS = {
   SAFETY_PROJECT: {
     GET_SAFETY_PROJECTS: (queryParams: string) => ['GET_SAFETY_PROJECTS', refineParams(queryParams)],
     GET_SAFETY_PROJECT: (safetyProjectId: string) => ['GET_SAFETY_PROJECT', safetyProjectId],
-    GET_SAFETY_PROJECT_SCHEDULE_TAB: (safetyProjectId: string) => ['GET_SAFETY_PROJECT_SCHEDULE_TAB', safetyProjectId]
+    GET_SAFETY_PROJECT_SCHEDULE_TAB: (safetyProjectId: string) => ['GET_SAFETY_PROJECT_SCHEDULE_TAB', safetyProjectId],
+    GET_SAFETY_AUTOCOMPLETE: (type: string, keyword: string) => ['GET_SAFETY_AUTOCOMPLETE', type, keyword]
   },
   SAFETY_ENGINEER: {
     GET_SAFETY_ENGINEERS: (queryParams: string) => ['GET_SAFETY_ENGINEERS', refineParams(queryParams)],
